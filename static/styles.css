@@ -24,6 +24,13 @@ body, html {
     font-size: 18px;
   }
   
+  #questionContainer {
+    /* Reduce the top padding to push content higher */
+    padding-top: 10vh;
+    /* Optionally adjust the height if needed */
+    height: calc(100vh - 70px); 
+  }
+
   #questionContainer h2 {
     font-size: 1.5em;
   }
