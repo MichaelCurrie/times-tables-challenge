@@ -79,6 +79,8 @@ sudo reboot
 
 10. Now anyone in the world can use it!  Enjoy!
 
+### How it works
+
 Note that step 6 above sets up a reverse proxy with nginx which will listen on port 80 and redirect to 5000, which is where gunicorn is running our Flask application (it knows to call `app.py`)
 
 This Flask application is serving two routes:
@@ -86,3 +88,18 @@ This Flask application is serving two routes:
 * `@app.route("/")` serves our static HTML/CSS/JS code when the user first arrives at the homepage, and
 * `@app.route("/submit", methods=["POST"])` serves the statistics for the heatmap
 
+### Making changes
+
+To debug something that's gone wrong, check the flask logs at:
+
+```bash
+sudo systemctl status gunicorn
+```
+
+If you make changes to the code, commit them, and then run:
+
+```bash
+git -C ~/times-tables-challenge/ pull
+sudo systemctl stop gunicorn
+sudo systemctl start gunicorn
+```
