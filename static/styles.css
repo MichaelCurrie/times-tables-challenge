@@ -23,8 +23,10 @@ body, html {
   body {
     font-size: 18px;
   }
-  
+
   #questionContainer {
+    /* Start content at the very top */
+    justify-content: flex-start;
     /* Reduce the top padding to push content higher */
     padding-top: 10vh;
     /* Optionally adjust the height if needed */
