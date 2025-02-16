@@ -1,4 +1,4 @@
-## My 30-minute fun activity: Times Tables Heatmap!
+## My 30-minute fun activity: [Times Tables Heatmap](times-tables.me)!
 
 I wanted to create a heatmap for the multiplication tables; for example, I have noticed that 9x9 is easier for me to recall than 6x8.
 
@@ -16,7 +16,7 @@ Then I did this:
 
 1. Log in to the AWS console
 
-2. Buy domain `times-tables.me` from AWS Route53
+2. Buy domain [times-tables.me](times-tables.me) from AWS Route53
 
 3. Launch AWS EC2 nano ubuntu instance; supply a public key for SSH access
 
