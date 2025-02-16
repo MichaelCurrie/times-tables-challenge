@@ -285,3 +285,29 @@ footer svg {
 #restartButton {
     margin-bottom: 0;
 }
+
+#keypad {
+  display: none; /* Hidden by default; shown on mobile */
+  margin-top: 20px;
+}
+
+.key-row {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+.key {
+  padding: 15px;
+  font-size: 1.5em;
+  background-color: #fff;
+  border: 2px solid #ccc;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.key:hover {
+  background-color: #f0f0f0;
+}

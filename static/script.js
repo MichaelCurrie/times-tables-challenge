@@ -5,6 +5,10 @@ function uuidv4() {
     );
 }
 
+function isMobile() {
+  return /Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+}
+
 // Get or create user_id using UUID v4
 let user_id = localStorage.getItem('user_id');
 if (!user_id) {
@@ -42,7 +46,25 @@ const heatmapDiv = document.getElementById('heatmap');
 const yourAverageP = document.getElementById('yourAverage');
 const yourCountP = document.getElementById('yourCount');
 
+// Global flag to track if submission is in progress.
+let submissionInProgress = false;
+
 // Event Listeners
+window.addEventListener("DOMContentLoaded", () => {
+  const answerInput = document.getElementById("answerInput");
+  const keypad = document.getElementById("keypad");
+
+  if (isMobile()) {
+    // On mobile, disable the native keyboard and show our keypad.
+    answerInput.setAttribute("readonly", true);
+    keypad.style.display = "block";
+  } else {
+    // On desktop, enable input and hide our keypad.
+    answerInput.removeAttribute("readonly");
+    keypad.style.display = "none";
+  }
+});
+
 startButton.addEventListener('click', startChallenge);
 document.addEventListener('keyup', e => {
     if (e.key === 'Enter' && startScreen.style.display !== 'none') startChallenge();
@@ -89,40 +111,58 @@ function nextQuestion() {
     currentStartTime = new Date();
 }
 
+// Add event listeners to each keypad button
+document.querySelectorAll("#keypad .key").forEach(key => {
+  key.addEventListener("click", function() {
+    const keyValue = this.dataset.key;
+    if (keyValue === "back") {
+      // Remove the last character
+      answerInput.value = answerInput.value.slice(0, -1);
+    } else if (keyValue === "clear") {
+      // Clear the input
+      answerInput.value = "";
+    } else {
+      // Append the number
+      answerInput.value += keyValue;
+    }
+  });
+});
+
 function submitAnswer() {
-    // If already disabled, do nothing.
-    if (answerInput.readOnly) return;
+    // Prevent double submissions with our own flag.
+    if (submissionInProgress) return;
+    submissionInProgress = true;
 
-    // Disable further input/submissions.
-    answerInput.readOnly = true;
-    submitAnswerButton.disabled = true;
-
+    // Get the answer value.
     const userAnswer = parseInt(answerInput.value);
     if (isNaN(userAnswer)) {
-        feedback.textContent = 'Please enter a valid number.';
-        // Re-enable to let the user correct their answer.
-        answerInput.readOnly = false;
-        submitAnswerButton.disabled = false;
-        return;
+       feedback.textContent = 'Please enter a valid number.';
+       submissionInProgress = false;
+       return;
     }
+
+    // For desktop users the input might not be readOnly, but if needed, disable the button.
+    submitAnswerButton.disabled = true;
+
     const currentTime = new Date();
     const timeTaken = (currentTime - currentStartTime) / 1000;
     const correctAnswer = currentQuestionData.a * currentQuestionData.b;
     const isCorrect = (userAnswer === correctAnswer);
     const effectiveTime = isCorrect ? timeTaken : timeTaken + penalty;
     const pill = document.querySelector(`#progressContainer .pill[data-index="${currentQuestion}"]`);
+
     if (isCorrect) {
-        feedback.textContent = 'Correct!'
+        feedback.textContent = 'Correct!';
         feedback.classList.add('correct');
         feedback.classList.remove('incorrect');
-        if (pill) {        
+        if (pill) {
            pill.classList.add('correct');
         }
     } else {
         feedback.textContent = `Incorrect. The correct answer was ${correctAnswer}.`;
         feedback.classList.add('incorrect');
         feedback.classList.remove('correct');
-        if (pill) {        
+        if (pill) {
            pill.classList.add('incorrect');
         }
     }
@@ -136,12 +176,17 @@ function submitAnswer() {
         time_taken: timeTaken,
         effective_time: effectiveTime
     });
+    
     setTimeout(() => {
         nextQuestion();
-        // Re-enable input and button for the next question.
-        answerInput.readOnly = false;
+        // Reset our submission flag and re-enable the submit button.
+        submissionInProgress = false;
         submitAnswerButton.disabled = false;
-        answerInput.focus(); // Set focus back to the answer input
+        // Only remove the readOnly state on desktop; on mobile, keep it so the native keyboard stays hidden.
+        if (!mobileMode) {
+          answerInput.readOnly = false;
+        }
+        answerInput.focus(); // Focus the answer input for new input
     }, 800);
 }
 
