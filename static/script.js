@@ -27,8 +27,8 @@ let challengeData = {};
 // For sharing, downsample the originalRows×originalCols heatmap to an x × y grid
 const originalRows = 12;
 const originalCols = 12;
-const sampleRows = 12;
-const sampleCols = 12;
+const sampleRows = 11;
+const sampleCols = 11;
 
 // DOM Elements
 const startScreen = document.getElementById('startScreen');
