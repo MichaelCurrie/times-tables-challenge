@@ -117,7 +117,7 @@ function submitAnswer() {
         answerInput.disabled = false;
         submitAnswerButton.disabled = false;
         answerInput.focus(); // Set focus back to the answer input
-    }, 1000);
+    }, 800);
 }
 
 function endChallenge() {
