@@ -48,6 +48,7 @@ const yourCountP = document.getElementById('yourCount');
 
 // Global flag to track if submission is in progress.
 let submissionInProgress = false;
+let mobileMode = false;
 
 // Event Listeners
 window.addEventListener("DOMContentLoaded", () => {
@@ -57,11 +58,16 @@ window.addEventListener("DOMContentLoaded", () => {
   if (isMobile()) {
     // On mobile, disable the native keyboard and show our keypad.
     answerInput.setAttribute("readonly", true);
+    // Hide the submit button because here is another one on the keypad.
+    console.log("welfiwje");
+    submitAnswerButton.classList.add('hidden');
     keypad.style.display = "block";
+    mobileMode = true;
   } else {
     // On desktop, enable input and hide our keypad.
     answerInput.removeAttribute("readonly");
     keypad.style.display = "none";
+    mobileMode = false;
   }
 });
 
@@ -71,9 +77,11 @@ document.addEventListener('keyup', e => {
 });
 
 submitAnswerButton.addEventListener('click', submitAnswer);
+
 answerInput.addEventListener('keyup', e => {
     if (e.key === 'Enter') submitAnswer();
 });
+
 restartButton.addEventListener('click', () => window.location.reload());
 
 // Add event listener to the share stats button.
@@ -83,6 +91,7 @@ shareStatsButton.addEventListener('click', shareStats);
 function startChallenge() {
     startScreen.style.display = 'none';
     questionContainer.style.display = 'flex';
+    document.body.classList.add('no-footer');
     currentQuestion = 0;
     sessionResults = [];
     // Reset the "pills" showing our progress
@@ -118,9 +127,8 @@ document.querySelectorAll("#keypad .key").forEach(key => {
     if (keyValue === "back") {
       // Remove the last character
       answerInput.value = answerInput.value.slice(0, -1);
-    } else if (keyValue === "clear") {
-      // Clear the input
-      answerInput.value = "";
+    } else if (keyValue === "submit") {
+      submitAnswer()
     } else {
       // Append the number
       answerInput.value += keyValue;
@@ -181,9 +189,9 @@ function submitAnswer() {
         nextQuestion();
         // Reset our submission flag and re-enable the submit button.
         submissionInProgress = false;
-        submitAnswerButton.disabled = false;
         // Only remove the readOnly state on desktop; on mobile, keep it so the native keyboard stays hidden.
         if (!mobileMode) {
+          submitAnswerButton.disabled = false;
           answerInput.readOnly = false;
         }
         answerInput.focus(); // Focus the answer input for new input
@@ -203,6 +211,7 @@ function endChallenge() {
         challengeData = data;
 
         // Update our user stats
+        document.body.classList.remove('no-footer');
         resultsContainer.style.display = 'block';
         renderHeatmap(data);
         yourAverageP.textContent = 'Response Time: ' + parseFloat(data.user_avg).toFixed(2) + ' s vs. ' + parseFloat(data.world_avg).toFixed(2) + ' s';

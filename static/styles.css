@@ -4,10 +4,15 @@
   box-sizing: border-box;
 }
 
+.hidden {
+  display: none;
+}
+
 body, html {
     font-size: 16px;
     margin: 0;
     padding: 0;
+    overflow: hidden;
     height: 100%;
     font-family: sans-serif;
     background-color: #f0f0f0;
@@ -45,6 +50,7 @@ body, html {
     /* Avoid overlapping the footer in the results screen
     but also avoid messing with our vertical centering calcs */
     height: calc(100vh - 70px);
+    padding: 0 1rem;
 }
 
 #startScreen {
@@ -188,7 +194,7 @@ footer {
     position: fixed;
     bottom: 0;
     left: 0;
-    font-size: 0.9em;
+    font-size: 0.7em;
     padding: 10px;
     background: #fff;
     width: 100%;
