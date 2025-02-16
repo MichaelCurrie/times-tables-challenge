@@ -42,7 +42,9 @@ body, html {
     min-height: 100vh;
     text-align: center;
     position: relative;
-    /* padding-bottom: 60px;*/
+    /* Avoid overlapping the footer in the results screen
+    but also avoid messing with our vertical centering calcs */
+    height: calc(100vh - 70px);
 }
 
 #startScreen {

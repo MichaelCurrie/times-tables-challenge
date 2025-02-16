@@ -91,17 +91,17 @@ function nextQuestion() {
 
 function submitAnswer() {
     // If already disabled, do nothing.
-    if (answerInput.disabled) return;
+    if (answerInput.readOnly) return;
 
     // Disable further input/submissions.
-    answerInput.disabled = true;
+    answerInput.readOnly = true;
     submitAnswerButton.disabled = true;
 
     const userAnswer = parseInt(answerInput.value);
     if (isNaN(userAnswer)) {
         feedback.textContent = 'Please enter a valid number.';
         // Re-enable to let the user correct their answer.
-        answerInput.disabled = false;
+        answerInput.readOnly = false;
         submitAnswerButton.disabled = false;
         return;
     }
@@ -139,7 +139,7 @@ function submitAnswer() {
     setTimeout(() => {
         nextQuestion();
         // Re-enable input and button for the next question.
-        answerInput.disabled = false;
+        answerInput.readOnly = false;
         submitAnswerButton.disabled = false;
         answerInput.focus(); // Set focus back to the answer input
     }, 800);
