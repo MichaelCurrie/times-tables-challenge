@@ -168,6 +168,7 @@ function submitAnswer() {
         }
     } else {
         feedback.textContent = `Incorrect. The correct answer was ${correctAnswer}.`;
+        questionText.textContent = `${currentQuestionData.a} * ${currentQuestionData.b} = ${correctAnswer}`
         feedback.classList.add('incorrect');
         feedback.classList.remove('correct');
         if (pill) {
