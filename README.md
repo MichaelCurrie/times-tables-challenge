@@ -2,6 +2,8 @@
 
 I wanted to create a heatmap for the multiplication tables; for example, I have noticed that 9x9 is easier for me to recall than 6x8.
 
+![image](https://github.com/user-attachments/assets/f63fec89-f52b-4e67-aebb-233b3013a98b)
+
 So I asked ChatGPT o3-mini-high to do this:
 
 > Write me a standalone website that will ask people to do multiplications up to 20x20 and time how long they took and whether it is correct.  so at the cetner of the screen it should ask them to do the times tables many many times and give the answer.  then at the end it should plot the results as a heatmap and also of all previous users
