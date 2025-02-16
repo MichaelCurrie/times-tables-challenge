@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Times Tables Challenge</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+<body>
+    <div class="container">
+        <!-- Start Screen -->
+        <div id="startScreen">
+            <h1>Times Tables Challenge</h1>
+            <p>Solve multiplication problems (up to 20×20) as fast as you can!</p>
+            <button id="startButton">Start Challenge</button>
+        </div>
+
+        <!-- Question Screen -->
+        <div id="questionContainer">
+            <h2 id="questionText"></h2>
+            <input type="number" id="answerInput" placeholder="Your answer">
+            <br>
+            <button id="submitAnswerButton">Submit</button>
+            <p id="feedback"></p>
+            <p id="progress"></p>
+        </div>
+
+        <!-- Results Screen -->
+        <div id="resultsContainer">
+            <div class="results-wrapper">
+                <div class="heatmap-container">
+                    <h2>Aggregated Heatmap<br>
+                    <small>(Avg Effective Time in sec)</small></h2>
+                    <div id="heatmap"></div>
+                </div>
+                <div class="stats-panel">
+                    <h3>Your Stats</h3>
+                    <p id="yourAverage">Your Average: -- sec</p>
+                    <p id="worldAverage">World Average: -- sec</p>
+                    <p id="score">Score: --</p>
+                </div>
+            </div>
+            <button id="restartButton">Restart Challenge</button>
+        </div>
+
+        <footer>
+            <a href="https://twitter.com/michaelbcurrie" target="_blank">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20" fill="currentColor">
+                    <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
+                </svg>
+                @michaelbcurrie
+            </a>
+        </footer>
+    </div>
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+</body>
+</html>
