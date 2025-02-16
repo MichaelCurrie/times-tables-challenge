@@ -19,6 +19,7 @@ let currentQuestion = 0;
 let currentStartTime;
 let currentQuestionData = null;
 let sessionResults = [];
+let challengeData = {};
 
 // DOM Elements
 const startScreen = document.getElementById('startScreen');
@@ -27,6 +28,7 @@ const resultsContainer = document.getElementById('resultsContainer');
 const questionText = document.getElementById('questionText');
 const answerInput = document.getElementById('answerInput');
 const submitAnswerButton = document.getElementById('submitAnswerButton');
+const shareStatsButton = document.getElementById('shareStatsButton')
 const feedback = document.getElementById('feedback');
 const progress = document.getElementById('progress');
 const startButton = document.getElementById('startButton');
@@ -48,6 +50,9 @@ answerInput.addEventListener('keyup', e => {
     if (e.key === 'Enter') submitAnswer();
 });
 restartButton.addEventListener('click', () => window.location.reload());
+
+// Add event listener to the share stats button.
+shareStatsButton.addEventListener('click', shareStats);
 
 // Functions
 function startChallenge() {
@@ -76,9 +81,19 @@ function nextQuestion() {
 }
 
 function submitAnswer() {
+    // If already disabled, do nothing.
+    if (answerInput.disabled) return;
+
+    // Disable further input/submissions.
+    answerInput.disabled = true;
+    submitAnswerButton.disabled = true;
+
     const userAnswer = parseInt(answerInput.value);
     if (isNaN(userAnswer)) {
         feedback.textContent = 'Please enter a valid number.';
+        // Re-enable to let the user correct their answer.
+        answerInput.disabled = false;
+        submitAnswerButton.disabled = false;
         return;
     }
     const currentTime = new Date();
@@ -96,7 +111,13 @@ function submitAnswer() {
         time_taken: timeTaken,
         effective_time: effectiveTime
     });
-    setTimeout(nextQuestion, 1000);
+    setTimeout(() => {
+        nextQuestion();
+        // Re-enable input and button for the next question.
+        answerInput.disabled = false;
+        submitAnswerButton.disabled = false;
+        answerInput.focus(); // Set focus back to the answer input
+    }, 1000);
 }
 
 function endChallenge() {
@@ -108,6 +129,10 @@ function endChallenge() {
     })
     .then(response => response.json())
     .then(data => {
+        // Save the data so it can be used in the share button
+        challengeData = data;
+
+        // Update our user stats
         resultsContainer.style.display = 'block';
         renderHeatmap(data);
         yourAverageP.textContent = 'Response Time: ' + parseFloat(data.user_avg).toFixed(2) + ' s';
@@ -117,8 +142,8 @@ function endChallenge() {
     });
 }
 
-// Render a heatmap table using the aggregated data from the server.
-function renderHeatmap(aggregatedData) {
+// Render a heatmap table using the challengeData from the server.
+function renderHeatmap() {
   
   heatmapDiv.innerHTML = '';
   const table = document.createElement('table');
@@ -138,9 +163,7 @@ function renderHeatmap(aggregatedData) {
 
   // Determine min and max average effective times for coloring.
   let minTime = Infinity, maxTime = -Infinity;
-  console.log("Hello Mama!!!");
-  console.log(aggregatedData);
-  const heatmapData = aggregatedData.heatmap;
+  const heatmapData = challengeData.heatmap;
   for (const key in heatmapData) {
     const avg = heatmapData[key].avg_effective;
     if (avg < minTime) minTime = avg;
@@ -183,4 +206,74 @@ Wrong Answers: ${heatmapData[key].wrong_count}`;
     table.appendChild(tr);
   }
   heatmapDiv.appendChild(table);
+}
+
+function renderHeatmapUnicode() {
+  const heatmapData = challengeData.heatmap;
+  let minTime = Infinity, maxTime = -Infinity;
+  
+  // Determine min and max average effective times
+  for (const key in heatmapData) {
+    const avg = heatmapData[key].avg_effective;
+    if (avg < minTime) minTime = avg;
+    if (avg > maxTime) maxTime = avg;
+  }
+  if (minTime === Infinity) minTime = 0;
+  if (maxTime === -Infinity) maxTime = 1;
+  
+  // Map an average time to a unicode square.
+  function getSymbol(avgTime) {
+    const ratio = (avgTime - minTime) / (maxTime - minTime + 0.0001);
+    if (ratio < 0.33) {
+      return "🟩"; // Best (lowest time)
+    } else if (ratio < 0.66) {
+      return "🟨"; // Middle range
+    } else {
+      return "🟥"; // Worst (highest time)
+    }
+  }
+  
+  // Down-sample the 20×20 heatmap to a 5×5 grid.
+  const sampleRows = 5;
+  const sampleCols = 5;
+  const originalSize = 20;
+  const gridRows = [];
+  
+  for (let i = 0; i < sampleRows; i++) {
+    let rowStr = "";
+    // Map the sampled row index to the original row (1-based)
+    const origRow = Math.floor(i * originalSize / sampleRows) + 1;
+    for (let j = 0; j < sampleCols; j++) {
+      const origCol = Math.floor(j * originalSize / sampleCols) + 1;
+      const key = `${origRow}_${origCol}`;
+      if (heatmapData[key]) {
+        const avg = heatmapData[key].avg_effective;
+        rowStr += getSymbol(avg);
+      } else {
+        rowStr += "⬜"; // Placeholder if no data exists
+      }
+    }
+    gridRows.push(rowStr);
+  }
+  return gridRows;
+}
+
+function shareStats() {
+    const gridRows = renderHeatmapUnicode()
+
+    // Construct the share text.
+    const shareText =
+      `${challengeData.user_avg.toFixed(2)} s avg on ${challengeData.user_count} problems\n\n` +
+      gridRows.join('\n') +
+      `\nhttps://times-tables.me`;
+
+    // Use the Clipboard API.
+    navigator.clipboard.writeText(shareText)
+      .then(() => {
+        alert("Stats copied to clipboard!");
+      })
+      .catch(err => {
+        console.error("Error copying stats: ", err);
+        alert("Failed to copy stats.");
+      });
 }
