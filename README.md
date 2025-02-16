@@ -1,4 +1,4 @@
-## A 30-minute fun activity: Times Tables Heatmap!
+## My 30-minute fun activity: Times Tables Heatmap!
 
 I wanted to create a heatmap for the multiplication tables; for example, I have noticed that 9x9 is easier for me to recall than 6x8.
 
@@ -12,25 +12,29 @@ After testing it, I refined the code with this additional prompt:
 
 Then I did this:
 
-1. Log in to my AWS account
+1. Log in to the AWS console
 
 2. Buy domain `times-tables.me` from AWS Route53
 
 3. Launch AWS EC2 nano ubuntu instance; supply a public key for SSH access
 
-3. Associate an AWS Elastic IP to this instance
+aws ec2 import-key-pair --key-name MyKeyPair --public-key-material file://path/to/your/public_key.pub
 
-4. Add an A-record for the Route53 Hosted Zone `times-tables.me`
+4. Allocate an AWS Elastic IP and associate it with this instance
 
-5. Add a security group allowing inbound on port 80 (for certbot)
+5. Add an A-record for the Route53 Hosted Zone `times-tables.me`
 
-6. Use Putty to connect using the key pair used to make the EC2 instance
+6. Add a security group allowing inbound on port 80 (for certbot)
+
+7. Use Putty to connect using the key pair used to make the EC2 instance and run:
 
 ```bash
 sudo apt-get update
 sudo apt-get install -y certbot python3-certbot-nginx gunicorn python3-flask nginx
 sudo certbot --nginx -d times-tables.me
 echo "alias python=python3" >> ~/.bashrc && source ~/.bashrc
+
+git clone https://github.com/MichaelCurrie/times-tables-challenge.git
 
 sudo tee /etc/systemd/system/gunicorn.service <<'EOF'
 [Unit]
@@ -40,8 +44,8 @@ After=network.target
 [Service]
 User=ubuntu
 Group=www-data
-WorkingDirectory=/home/ubuntu/multiply
-ExecStart=/home/ubuntu/venv/bin/gunicorn --workers 3 --bind 0.0.0.0:5000 app:app
+WorkingDirectory=/home/ubuntu/times-tables-challenge
+ExecStart=/usr/bin/gunicorn --workers 3 --bind 0.0.0.0:5000 app:app
 
 [Install]
 WantedBy=multi-user.target
@@ -62,14 +66,6 @@ server {
 EOF
 ```
 
-7. Then I pasted my code:
-
-```bash
-mkdir ~/multiply
-vim ~/multiply/app.py
-# (PASTE YOUR CODE FROM CHATGPT)
-```
-
 8. Then I rebooted the server:
 
 ```bash
@@ -82,3 +78,11 @@ sudo reboot
 9. Then I removed the port 80 security group that has an inbound security risk.
 
 10. Now anyone in the world can use it!  Enjoy!
+
+Note that step 6 above sets up a reverse proxy with nginx which will listen on port 80 and redirect to 5000, which is where gunicorn is running our Flask application (it knows to call `app.py`)
+
+This Flask application is serving two routes:
+
+* `@app.route("/")` serves our static HTML/CSS/JS code when the user first arrives at the homepage, and
+* `@app.route("/submit", methods=["POST"])` serves the statistics for the heatmap
+

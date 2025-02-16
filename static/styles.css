@@ -5,11 +5,34 @@
 }
 
 body, html {
+    font-size: 16px;
     margin: 0;
     padding: 0;
     height: 100%;
     font-family: sans-serif;
     background-color: #f0f0f0;
+}
+
+/* Adjust for small screens */
+@media (max-width: 600px) {
+  body {
+    font-size: 18px;
+  }
+  
+  #questionContainer h2 {
+    font-size: 1.5em;
+  }
+  
+  #answerInput {
+    width: 250px;
+    font-size: 20px;
+    padding: 12px;
+  }
+  
+  button {
+    font-size: 18px;
+    padding: 12px 24px;
+  }
 }
 
 .container {

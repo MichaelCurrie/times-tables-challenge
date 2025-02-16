@@ -81,7 +81,7 @@ function nextQuestion() {
     const a = Math.floor(Math.random() * originalRows) + 1;
     const b = Math.floor(Math.random() * originalCols) + 1;
     currentQuestionData = { a, b };
-    questionText.textContent = `${a} × ${b}?`;
+    questionText.textContent = `${a} × ${b}`;
     answerInput.value = '';
     answerInput.focus();
     feedback.textContent = '';
