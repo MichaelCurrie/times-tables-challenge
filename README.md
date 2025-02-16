@@ -20,8 +20,6 @@ Then I did this:
 
 3. Launch AWS EC2 nano ubuntu instance; supply a public key for SSH access
 
-aws ec2 import-key-pair --key-name MyKeyPair --public-key-material file://path/to/your/public_key.pub
-
 4. Allocate an AWS Elastic IP and associate it with this instance
 
 5. Add an A-record for the Route53 Hosted Zone `times-tables.me`
