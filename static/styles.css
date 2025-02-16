@@ -12,7 +12,7 @@ body, html {
     font-size: 16px;
     margin: 0;
     padding: 0;
-    overflow: hidden;
+    /*overflow: hidden; prevent scrolling??*/
     height: 100%;
     font-family: sans-serif;
     background-color: #f0f0f0;
@@ -39,7 +39,7 @@ body, html {
   
   #answerInput {
     width: 250px;
-    font-size: 20px;
+    font-size: 18px;
     padding: 12px;
   }
   
