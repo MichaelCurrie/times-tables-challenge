@@ -13,13 +13,18 @@ if (!user_id) {
 }
 
 // Configuration
-const totalQuestions = 5;
+const totalQuestions = 10;
 const penalty = 10;
 let currentQuestion = 0;
 let currentStartTime;
 let currentQuestionData = null;
 let sessionResults = [];
 let challengeData = {};
+// For sharing, downsample the originalRows×originalCols heatmap to an x × y grid
+const originalRows = 12;
+const originalCols = 12;
+const sampleRows = 12;
+const sampleCols = 12;
 
 // DOM Elements
 const startScreen = document.getElementById('startScreen');
@@ -36,8 +41,6 @@ const restartButton = document.getElementById('restartButton');
 const heatmapDiv = document.getElementById('heatmap');
 const yourAverageP = document.getElementById('yourAverage');
 const yourCountP = document.getElementById('yourCount');
-const worldAverageP = document.getElementById('worldAverage');
-const worldCountP = document.getElementById('worldCount');
 
 // Event Listeners
 startButton.addEventListener('click', startChallenge);
@@ -57,9 +60,15 @@ shareStatsButton.addEventListener('click', shareStats);
 // Functions
 function startChallenge() {
     startScreen.style.display = 'none';
-    questionContainer.style.display = 'block';
+    questionContainer.style.display = 'flex';
     currentQuestion = 0;
     sessionResults = [];
+    // Reset the "pills" showing our progress
+    const pills = document.querySelectorAll('#progressContainer .pill');
+    pills.forEach(pill => {
+        pill.classList.remove('correct');
+        pill.classList.remove('incorrect');
+    });
     nextQuestion();
 }
 
@@ -69,10 +78,10 @@ function nextQuestion() {
         return;
     }
     currentQuestion++;
-    const a = Math.floor(Math.random() * 20) + 1;
-    const b = Math.floor(Math.random() * 20) + 1;
+    const a = Math.floor(Math.random() * originalRows) + 1;
+    const b = Math.floor(Math.random() * originalCols) + 1;
     currentQuestionData = { a, b };
-    questionText.textContent = `Question ${currentQuestion}/${totalQuestions}: What is ${a} × ${b}?`;
+    questionText.textContent = `${a} × ${b}?`;
     answerInput.value = '';
     answerInput.focus();
     feedback.textContent = '';
@@ -101,7 +110,23 @@ function submitAnswer() {
     const correctAnswer = currentQuestionData.a * currentQuestionData.b;
     const isCorrect = (userAnswer === correctAnswer);
     const effectiveTime = isCorrect ? timeTaken : timeTaken + penalty;
-    feedback.textContent = isCorrect ? 'Correct!' : `Incorrect. The correct answer was ${correctAnswer}.`;
+    const pill = document.querySelector(`#progressContainer .pill[data-index="${currentQuestion}"]`);
+    if (isCorrect) {
+        feedback.textContent = 'Correct!'
+        feedback.classList.add('correct');
+        feedback.classList.remove('incorrect');
+        if (pill) {        
+           pill.classList.add('correct');
+        }
+    } else {
+        feedback.textContent = `Incorrect. The correct answer was ${correctAnswer}.`;
+        feedback.classList.add('incorrect');
+        feedback.classList.remove('correct');
+        if (pill) {        
+           pill.classList.add('incorrect');
+        }
+    }
+    
     progress.textContent = `Time: ${timeTaken.toFixed(2)} sec${isCorrect ? '' : ' (+penalty)'}`;
     sessionResults.push({
         a: currentQuestionData.a,
@@ -135,10 +160,8 @@ function endChallenge() {
         // Update our user stats
         resultsContainer.style.display = 'block';
         renderHeatmap(data);
-        yourAverageP.textContent = 'Response Time: ' + parseFloat(data.user_avg).toFixed(2) + ' s';
-        yourCountP.textContent = 'Answers Submitted: ' + parseFloat(data.user_count).toFixed(0);
-        worldAverageP.textContent = 'Response Time: ' + parseFloat(data.world_avg).toFixed(2) + ' s';
-        worldCountP.textContent = 'Answers Submitted: ' + parseFloat(data.world_count).toFixed(0);
+        yourAverageP.textContent = 'Response Time: ' + parseFloat(data.user_avg).toFixed(2) + ' s vs. ' + parseFloat(data.world_avg).toFixed(2) + ' s';
+        yourCountP.textContent = 'Answers Submitted: ' + parseFloat(data.user_count).toFixed(0) + ' / ' + parseFloat(data.world_count).toFixed(0);
     });
 }
 
@@ -149,12 +172,12 @@ function renderHeatmap() {
   const table = document.createElement('table');
   table.className = 'heatmap';
 
-  // Create header row (columns 1-20)
+  // Create header row (columns 1-originalCols)
   const headerRow = document.createElement('tr');
   const emptyHeader = document.createElement('th');
   emptyHeader.textContent = '';
   headerRow.appendChild(emptyHeader);
-  for (let col = 1; col <= 20; col++) {
+  for (let col = 1; col <= originalCols; col++) {
     const th = document.createElement('th');
     th.textContent = col;
     headerRow.appendChild(th);
@@ -180,13 +203,13 @@ function renderHeatmap() {
     return `rgb(${red}, ${green}, 0)`;
   }
 
-  // Create table rows (for multiplicand 1 to 20).
-  for (let row = 1; row <= 20; row++) {
+  // Create table rows (for multiplicand 1 to originalRows).
+  for (let row = 1; row <= originalRows; row++) {
     const tr = document.createElement('tr');
     const rowHeader = document.createElement('th');
     rowHeader.textContent = row;
     tr.appendChild(rowHeader);
-    for (let col = 1; col <= 20; col++) {
+    for (let col = 1; col <= originalCols; col++) {
       const td = document.createElement('td');
       const key = row + '_' + col;
       if (heatmapData[key]) {
@@ -233,18 +256,14 @@ function renderHeatmapUnicode() {
     }
   }
   
-  // Down-sample the 20×20 heatmap to a 5×5 grid.
-  const sampleRows = 5;
-  const sampleCols = 5;
-  const originalSize = 20;
   const gridRows = [];
   
   for (let i = 0; i < sampleRows; i++) {
     let rowStr = "";
     // Map the sampled row index to the original row (1-based)
-    const origRow = Math.floor(i * originalSize / sampleRows) + 1;
+    const origRow = Math.floor(i * originalRows / sampleRows) + 1;
     for (let j = 0; j < sampleCols; j++) {
-      const origCol = Math.floor(j * originalSize / sampleCols) + 1;
+      const origCol = Math.floor(j * originalCols / sampleCols) + 1;
       const key = `${origRow}_${origCol}`;
       if (heatmapData[key]) {
         const avg = heatmapData[key].avg_effective;

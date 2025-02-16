@@ -1,3 +1,9 @@
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
 body, html {
     margin: 0;
     padding: 0;
@@ -16,10 +22,104 @@ body, html {
     /* padding-bottom: 60px;*/
 }
 
-#questionContainer, #resultsContainer {
-    display: none;
-    width: 80%;
-    max-width: 800px;
+#startScreen {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  height: 100vh;
+  padding: 0 1rem;
+  box-sizing: border-box;
+}
+
+/* For questionContainer, we want its content 
+to start 30% down from the top */
+#questionContainer {
+  display: none;
+  flex-direction: column;
+  justify-content: flex-start; /* Start from the top */
+  align-items: center;
+  width: 100%;
+  height: 100vh;
+  padding-top: 30vh;  /* Push content down by 30% of the viewport height */
+  box-sizing: border-box;
+}
+
+#progressContainer {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 20px;
+  gap: 8px;
+}
+
+.pill {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background-color: #ccc; /* default gray */
+  transition: background-color 0.3s ease;
+}
+
+.pill.correct {
+  background-color: #6aaa64;  /* Wordle green */
+}
+
+.pill.incorrect {
+  background-color: #e57373;  /* Soft red */
+}
+
+#answerInput {
+  width: 200px; /* Adjust as needed */
+  font-size: 18px;
+  padding: 10px;
+  text-align: center;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+#startScreen .startButton {
+  appearance: none;
+  background-color: transparent;
+  border: 2px solid #1A1A1A;
+  border-radius: 15px;
+  box-sizing: border-box;
+  color: #3B3B3B;
+  cursor: pointer;
+  display: inline-block;
+  font-family: Roobert,-apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,sans-serif,"Apple Color Emoji","Segoe UI Emoji","Segoe UI Symbol";
+  font-size: 16px;
+  font-weight: 600;
+  line-height: normal;
+  margin: 0;
+  min-height: 60px;
+  min-width: 0;
+  outline: none;
+  padding: 16px 24px;
+  text-align: center;
+  text-decoration: none;
+  transition: all 300ms cubic-bezier(.23, 1, 0.32, 1);
+  user-select: none;
+  -webkit-user-select: none;
+  touch-action: manipulation;
+  width: auto;
+  will-change: transform;
+}
+
+.startButton:disabled {
+  pointer-events: none;
+}
+
+.startButton:hover {
+  color: #fff;
+  background-color: #1A1A1A;
+  box-shadow: rgba(0, 0, 0, 0.25) 0 8px 15px;
+  transform: translateY(-2px);
+}
+
+.startButton:active {
+  box-shadow: none;
+  transform: translateY(0);
 }
 
 button {
@@ -38,22 +138,12 @@ input[type="number"] {
 
 .results-wrapper {
     display: flex;
-    justify-content: space-between;
-    align-items: flex-start;
+    width: 100%;
 }
 
 .heatmap-container {
     flex: 1;
-}
-
-.stats-panel {
-    width: 200px;
-    margin-left: 20px;
-    text-align: left;
-    background: #fff;
-    padding: 10px;
-    border: 1px solid #ccc;
-    border-radius: 4px;
+    margin-bottom: 1.5rem;
 }
 
 table.heatmap {
@@ -90,4 +180,83 @@ footer a {
 footer svg {
     vertical-align: middle;
     margin-right: 5px;
+}
+
+.correct {
+  color: green;
+  font-weight: bold;
+}
+
+.incorrect {
+  color: red;
+  font-weight: bold;
+}
+
+.share-button {
+  display: inline-flex;
+  align-items: center;
+  padding: 10px 16px;
+  background-color: #007bff;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  font-size: 16px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+.share-button:hover {
+  background-color: #0056b3;
+  transform: translateY(-2px);
+}
+
+.share-button:active {
+  transform: translateY(0);
+}
+
+.share-icon {
+  margin-right: 8px;
+  fill: currentColor; /* Inherits the button's color */
+}
+
+#resultsContainer {
+    display: none;
+    flex-direction: column;
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 1rem;
+}
+
+.stats-panel {
+    width: 100%;
+    box-sizing: border-box;  /* ensures padding and border are included in width */
+    text-align: left;
+    background: #fff;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
+/* This ensures the buttons stack vertically */
+#shareStatsButton,
+#restartButton, #resultsContainer.stats-panel {
+    display: block;
+    width: 100%;
+    margin-bottom: 1rem;
+    padding: 0.75rem 1rem;
+    border-radius: 0.5rem;
+}
+
+/* Optional: Style for the share button */
+#shareStatsButton {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+}
+
+/* Remove margin from the last button */
+#restartButton {
+    margin-bottom: 0;
 }
