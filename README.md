@@ -2,7 +2,7 @@
 
 I wanted to create a heatmap for the multiplication tables; for example, I have noticed that 9x9 is easier for me to recall than 6x8.
 
-![image](https://github.com/user-attachments/assets/f63fec89-f52b-4e67-aebb-233b3013a98b)
+<img src="https://github.com/user-attachments/assets/f63fec89-f52b-4e67-aebb-233b3013a98b" alt="Description" width="300">
 
 So I asked ChatGPT o3-mini-high to do this:
 
