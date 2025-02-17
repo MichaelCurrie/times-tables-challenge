@@ -173,6 +173,7 @@ table.heatmap {
   border-collapse: collapse;
   margin: 10px auto;
   table-layout: fixed; /* Force constant-width columns */
+  min-width: 400px; /* Refuse to shrink the table too much */
 }
 
 table.heatmap th,

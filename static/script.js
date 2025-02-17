@@ -163,6 +163,7 @@ function submitAnswer() {
     const isCorrect = (userAnswer === correctAnswer);
     const effectiveTime = isCorrect ? timeTaken : timeTaken + penalty;
     const pill = document.querySelector(`#progressContainer .pill[data-index="${currentQuestion}"]`);
+    let penaltyMsg = '';
 
     if (isCorrect) {
         feedback.textContent = 'Correct!';
@@ -171,6 +172,7 @@ function submitAnswer() {
         if (pill) {
             pill.classList.add('correct');
         }
+        penaltyMsg = '';
     } else {
         feedback.textContent = `Incorrect. The correct answer was ${correctAnswer}.`;
         questionText.textContent = `${currentQuestionData.a} * ${currentQuestionData.b} = ${correctAnswer}`
@@ -179,9 +181,10 @@ function submitAnswer() {
         if (pill) {
             pill.classList.add('incorrect');
         }
+        penaltyMsg = ` (+ ${penalty.toFixed(0)} s penalty)`;
     }
 
-    progress.textContent = `Time: ${timeTaken.toFixed(2)} sec${isCorrect ? '' : ' (+penalty)'}`;
+    progress.textContent = `Time: ${timeTaken.toFixed(2)} s${penaltyMsg}`;
     sessionResults.push({
         a: currentQuestionData.a,
         b: currentQuestionData.b,
