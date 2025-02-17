@@ -172,6 +172,7 @@ input[type="number"] {
 table.heatmap {
   border-collapse: collapse;
   margin: 10px auto;
+  table-layout: fixed; /* Force constant-width columns */
 }
 
 table.heatmap th,
