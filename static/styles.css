@@ -359,3 +359,10 @@ footer svg {
     padding: 12px 24px;
   }
 }
+
+@media (max-width: 480px) {
+  table.heatmap {
+    width: 100%;
+    min-width: auto; /* Override fixed min-width */
+  }
+}
