@@ -34,7 +34,7 @@ html {
   position: relative;
   /* Avoid overlapping the footer in the results screen
      but also avoid messing with our vertical centering calcs */
-  height: calc(100vh - 70px);
+  height: calc(100vh - 100px);
   padding: 0 1rem;
 }
 
@@ -189,7 +189,6 @@ table.heatmap td {
   max-width: 800px;
   margin: 0 auto;
   padding: 1rem;
-  overflow-y: auto; /* allow vertical scrolling if needed */
 }
 
 .stats-panel {
