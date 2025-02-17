@@ -53,6 +53,8 @@ let submissionInProgress = false;
 let mobileMode = false;
 
 // Event Listeners
+window.addEventListener('load', scaleHeatmap);
+window.addEventListener('resize', scaleHeatmap);
 window.addEventListener("DOMContentLoaded", () => {
     const answerInput = document.getElementById("answerInput");
     const keypad = document.getElementById("keypad");
@@ -365,4 +367,28 @@ function shareStats() {
             console.error("Error copying stats: ", err);
             alert("Failed to copy stats.");
         });
+}
+
+function scaleHeatmap() {
+    // Select the table and its container
+    const table = document.querySelector('table.heatmap');
+    const container = document.querySelector('.heatmap-container');
+    if (!table || !container) return;
+    
+    // The table’s natural width (should match your CSS: 400px)
+    const tableNaturalWidth = 400;
+    // Get the container’s current width
+    const containerWidth = container.clientWidth;
+    
+    // Compute scale factor (never more than 1, so we don't upscale)
+    const scaleFactor = Math.min(containerWidth / tableNaturalWidth, 1);
+    
+    // Apply the scale transform
+    table.style.transform = `scale(${scaleFactor})`;
+    table.style.transformOrigin = 'top center';
+    
+    // Optionally, adjust the container's height to account for the scaled table height
+    // (Assuming the table height is fixed or predictable)
+    //const tableHeight = table.offsetHeight;
+    //container.style.height = `${tableHeight * scaleFactor}px`;
 }

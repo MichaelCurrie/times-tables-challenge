@@ -167,7 +167,10 @@ input[type="number"] {
 
 .heatmap-container {
   flex: 1;
+  overflow: hidden;  /* no scroll bars */
+  /*margin-bottom: 20px;*/ /* Adjust spacing to ensure no overlap with stats-panel */
   margin-bottom: 1.5rem;
+  width: 100%;
 }
 
 table.heatmap {
@@ -205,7 +208,8 @@ table.heatmap td {
   border-radius: 4px;
 }
 
-/* Ensure buttons stack vertically in results */
+/* Ensure elements stack vertically in results */
+#results-wrapper,
 #shareStatsButton,
 #restartButton,
 #resultsContainer.stats-panel {
