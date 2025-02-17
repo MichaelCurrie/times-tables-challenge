@@ -81,7 +81,7 @@ sudo reboot
 
 ### How it works
 
-Note that step 6 above sets up a reverse proxy with nginx which will listen on port 80 and redirect to 5000, which is where gunicorn is running our Flask application (it knows to call `app.py`)
+We use a reverse proxy with **nginx** which will listen on port 80 and redirect to 5000, which is where **gunicorn** is running our **Flask** application (it knows to call `app.py`).
 
 This Flask application is serving two routes:
 
