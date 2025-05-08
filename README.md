@@ -66,12 +66,24 @@ server {
 EOF
 ```
 
-8. Then I rebooted the server:
+8. Then I set up both the nginx and gunicorn processes to start on each server boot:
 
 ```bash
 sudo systemctl daemon-reload
-sudo systemctl start gunicorn
+
+# Ensure the 
 sudo systemctl enable gunicorn
+sudo systemctl enable nginx
+
+sudo systemctl start gunicorn
+sudo systemctl start nginx
+
+sudo systemctl reload nginx
+```
+
+Then a reboot to check that all is good:
+
+```bash
 sudo reboot
 ```
 
@@ -94,6 +106,7 @@ To debug something that's gone wrong, check the flask logs at:
 
 ```bash
 sudo systemctl status gunicorn
+sudo systemctl status nginx
 ```
 
 If you make changes to the code, commit them, and then run:
