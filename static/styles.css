@@ -383,11 +383,14 @@ body.pizza-theme {
 }
 
 body.pizza-theme .container {
-  background: rgba(255, 255, 255, 0.1);
-  backdrop-filter: blur(10px);
+  background: rgba(255, 255, 255, 0.15);
+  backdrop-filter: blur(15px);
   border-radius: 20px;
   margin: 20px;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+  position: relative;
+  z-index: 2;
+  border: 1px solid rgba(255, 255, 255, 0.2);
 }
 
 /* Pizza header with image */
@@ -396,6 +399,8 @@ body.pizza-theme .container {
   flex-direction: column;
   align-items: center;
   margin-bottom: 30px;
+  position: relative;
+  z-index: 2;
 }
 
 .pizza-image {
@@ -405,6 +410,42 @@ body.pizza-theme .container {
   margin-bottom: 20px;
   box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
   border: 3px solid #fff;
+  position: relative;
+  z-index: 2;
+}
+
+/* Animated background pizza image */
+.pizza-background {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-image: url('../pizza_family.png');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  z-index: 1;
+  animation: pizzaPan 20s ease-in-out infinite;
+  filter: brightness(0.3) blur(2px);
+}
+
+@keyframes pizzaPan {
+  0% {
+    transform: scale(1.2) translate(0%, 0%);
+  }
+  25% {
+    transform: scale(1.4) translate(-5%, -3%);
+  }
+  50% {
+    transform: scale(1.3) translate(3%, -5%);
+  }
+  75% {
+    transform: scale(1.5) translate(-2%, 2%);
+  }
+  100% {
+    transform: scale(1.2) translate(0%, 0%);
+  }
 }
 
 /* Pizza-themed buttons */
@@ -577,9 +618,12 @@ body.pizza-theme footer a:hover {
   max-width: 400px;
   margin: 0 auto;
   padding: 20px;
-  background: rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.2);
   border-radius: 15px;
-  border: 2px solid rgba(255, 255, 255, 0.2);
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  backdrop-filter: blur(10px);
+  position: relative;
+  z-index: 3;
 }
 
 .form-group {
@@ -636,11 +680,14 @@ body.pizza-theme footer a:hover {
 }
 
 .summary-card {
-  background: rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.2);
   border-radius: 15px;
   padding: 20px;
-  border: 2px solid rgba(255, 255, 255, 0.2);
+  border: 2px solid rgba(255, 255, 255, 0.3);
   text-align: left;
+  backdrop-filter: blur(10px);
+  position: relative;
+  z-index: 3;
 }
 
 .summary-card h3 {
