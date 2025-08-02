@@ -421,11 +421,15 @@ body.pizza-theme .container {
   left: 0;
   width: 100%;
   height: 100%;
-  background-image: url('../pizza_family.png');
-  background-size: cover;
-  background-position: center;
-  background-repeat: no-repeat;
   z-index: 1;
+  overflow: hidden;
+}
+
+.pizza-background img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
   animation: pizzaPan 20s ease-in-out infinite;
   filter: brightness(0.3) blur(2px);
 }
