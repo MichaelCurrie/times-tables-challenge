@@ -88,7 +88,13 @@ init_db()
 
 @app.route("/")
 def index():
-    return render_template('index.html')
+    # Check the host header to determine which template to serve
+    host = request.headers.get('Host', '').lower()
+    
+    if 'slicetomeetyou.com' in host:
+        return render_template('pizza.html')
+    else:
+        return render_template('index.html')
 
 @app.route("/submit", methods=["POST"])
 def submit():

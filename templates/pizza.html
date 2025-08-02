@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+        <title>Slice to Meet You Pizza Picker</title>
+        <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+    </head>
+    <body>
+        <div class="container">
+            <!-- Start Screen -->
+            <div id="startScreen">
+                <h1>Slice to Meet You Pizza Picker</h1>
+                <p>Multiply integers (up to 12×12) as fast as you can!</p>
+                <br>
+                <button class="startButton" id="startButton" aria-label="Start Challenge" role="button">
+                Start Challenge
+                </button>
+            </div>
+            <!-- Question Screen -->
+            <div id="questionContainer">
+                <div id="progressContainer">
+                    <div class="pill" data-index="1"></div>
+                    <div class="pill" data-index="2"></div>
+                    <div class="pill" data-index="3"></div>
+                    <div class="pill" data-index="4"></div>
+                    <div class="pill" data-index="5"></div>
+                    <div class="pill" data-index="6"></div>
+                    <div class="pill" data-index="7"></div>
+                    <div class="pill" data-index="8"></div>
+                    <div class="pill" data-index="9"></div>
+                    <div class="pill" data-index="10"></div>
+                </div>
+                <h2 id="questionText"></h2>
+                <input type="number" id="answerInput" placeholder="Your answer">
+                <!-- On‑screen numeric keypad -->
+                <div id="keypad">
+                    <div class="key-row">
+                        <button class="key" data-key="1">1</button>
+                        <button class="key" data-key="2">2</button>
+                        <button class="key" data-key="3">3</button>
+                    </div>
+                    <div class="key-row">
+                        <button class="key" data-key="4">4</button>
+                        <button class="key" data-key="5">5</button>
+                        <button class="key" data-key="6">6</button>
+                    </div>
+                    <div class="key-row">
+                        <button class="key" data-key="7">7</button>
+                        <button class="key" data-key="8">8</button>
+                        <button class="key" data-key="9">9</button>
+                    </div>
+                    <div class="key-row">
+                        <button class="key" data-key="back">⌫</button>
+                        <button class="key" data-key="0">0</button>
+                        <button class="key" data-key="submit">Submit</button>
+                    </div>
+                </div>
+                <br>
+                <button id="submitAnswerButton">Submit</button>
+                <p id="feedback"></p>
+                <p id="progress"></p>
+            </div>
+            <!-- Results Screen -->
+            <div id="resultsContainer">
+                <div class="results-wrapper">
+                    <div class="heatmap-container">
+                        <h2>Multiplication Table Heatmap<br>
+                            <small>Average Effective Time (s)</small>
+                        </h2>
+                        <div id="heatmap"></div>
+                    </div>
+                </div>
+                <div class="stats-panel">
+                    <h3>Your Stats vs. The World</h3>
+                    <p id="yourAverage">Response Time: -- s vs. -- s</p>
+                    <p id="yourCount">Answers Submitted: -- / --</p>
+                </div>
+                <button id="shareStatsButton" class="share-button">
+                    <svg
+                        class="share-icon"
+                        width="24"
+                        height="24"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        xmlns="http://www.w3.org/2000/svg"
+                        >
+                        <path
+                            d="M18 16.08C17.24 16.08 16.56 16.38 16.05 16.88L8.91 12.7C8.96 12.47 9 12.24 9 12C9 11.76 8.96 11.53 8.91 11.3L15.96 7.18C16.5 7.69 17.22 8 18 8C19.66 8 21 6.66 21 5C21 3.34 19.66 2 18 2C16.34 2 15 3.34 15 5C15 5.24 15.04 5.47 15.09 5.7L8.04 9.82C7.5 9.31 6.78 9 6 9C4.34 9 3 10.34 3 12C3 13.66 4.34 15 6 15C6.78 15 7.5 14.69 8.04 14.18L15.16 18.36C15.11 18.58 15.08 18.79 15.08 19C15.08 20.66 16.42 22 18.08 22C19.74 22 21.08 20.66 21.08 19C21.08 17.34 19.74 16 18.08 16Z"
+                            fill="currentColor"
+                            />
+                    </svg>
+                    <span>Share Stats</span>
+                </button>
+                <br>
+                <button id="restartButton">Restart Challenge</button>
+            </div>
+            <footer id="siteFooter">
+                <a href="https://twitter.com/michaelbcurrie" target="_blank">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20" fill="currentColor">
+                        <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
+                    </svg>
+                    @michaelbcurrie
+                </a>
+            </footer>
+        </div>
+        <script src="{{ url_for('static', filename='script.js') }}"></script>
+    </body>
+</html> 

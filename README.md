@@ -24,15 +24,28 @@ Then I did this:
 
 5. Add an A-record for the Route53 Hosted Zone `times-tables.me`
 
-6. Add a security group allowing inbound on port 80 (for certbot)
+6. Add a security group allowing inbound on ports 80 (for certbot) and 443 (for HTTPS)
 
 7. Use Putty to connect using the key pair used to make the EC2 instance and run:
 
 ```bash
 sudo apt-get update
 sudo apt-get install -y certbot python3-certbot-nginx gunicorn python3-flask nginx
-sudo certbot --nginx -d times-tables.me
+sudo certbot --nginx -d times-tables.me -d www.times-tables.me -d slicetomeetyou.com -d www.slicetomeetyou.com
 echo "alias python=python3" >> ~/.bashrc && source ~/.bashrc
+sudo tee /etc/nginx/sites-available/default << 'EOF'
+server {
+    listen 80;
+    server_name times-tables.me www.times-tables.me slicetomeetyou.com www.slicetomeetyou.com;
+
+    location / {
+        proxy_pass http://127.0.0.1:5000;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+    }
+}
+EOF
 
 git clone https://github.com/MichaelCurrie/times-tables-challenge.git
 
@@ -50,20 +63,6 @@ ExecStart=/usr/bin/gunicorn --workers 3 --bind 0.0.0.0:5000 app:app
 [Install]
 WantedBy=multi-user.target
 EOF
-
-sudo tee /etc/nginx/sites-available/times-tables.me << 'EOF'
-server {
-    listen 80;
-    server_name times-tables.me www.times-tables.me;
-
-    location / {
-        proxy_pass http://127.0.0.1:5000;
-        proxy_set_header Host $host;
-        proxy_set_header X-Real-IP $remote_addr;
-        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-    }
-}
-EOF
 ```
 
 8. Then I set up both the nginx and gunicorn processes to start on each server boot:
@@ -71,7 +70,10 @@ EOF
 ```bash
 sudo systemctl daemon-reload
 
-# Ensure the 
+# Enable the nginx site configuration
+sudo ln -s /etc/nginx/sites-available/default /etc/nginx/sites-enabled/
+
+# Ensure the services are enabled
 sudo systemctl enable gunicorn
 sudo systemctl enable nginx
 
@@ -87,7 +89,7 @@ Then a reboot to check that all is good:
 sudo reboot
 ```
 
-9. Then I removed the port 80 security group that has an inbound security risk.
+9. Then I removed the port 80 security group rule that has an inbound security risk, keeping only port 443 (HTTPS) open.
 
 10. Now anyone in the world can use it!  Enjoy!
 
