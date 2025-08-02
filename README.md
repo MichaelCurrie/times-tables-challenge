@@ -31,7 +31,7 @@ Then I did this:
 ```bash
 sudo apt-get update
 sudo apt-get install -y certbot python3-certbot-nginx gunicorn python3-flask nginx
-sudo certbot --nginx -d times-tables.me -d www.times-tables.me -d slicetomeetyou.com -d www.slicetomeetyou.com
+sudo certbot --nginx -d times-tables.me -d slicetomeetyou.com
 echo "alias python=python3" >> ~/.bashrc && source ~/.bashrc
 sudo tee /etc/nginx/sites-available/default << 'EOF'
 server {
