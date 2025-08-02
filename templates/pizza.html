@@ -6,11 +6,14 @@
         <title>Slice to Meet You Pizza Picker</title>
         <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
     </head>
-    <body>
+    <body class="pizza-theme">
         <div class="container">
             <!-- Start Screen -->
             <div id="startScreen">
-                <h1>Slice to Meet You Pizza Picker</h1>
+                <div class="pizza-header">
+                    <img src="{{ url_for('static', filename='pizza_family.png') }}" alt="Pizza Family" class="pizza-image">
+                    <h1>Slice to Meet You Pizza Picker</h1>
+                </div>
                 <p>Multiply integers (up to 12×12) as fast as you can!</p>
                 <br>
                 <button class="startButton" id="startButton" aria-label="Start Challenge" role="button">

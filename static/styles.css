@@ -371,3 +371,141 @@ footer svg {
     min-width: auto; /* Override fixed min-width */
   }
 }
+
+/* ==========================================================================
+   Pizza Theme Styles (for slicetomeetyou.com)
+   ========================================================================== */
+
+/* Pizza-themed background and colors */
+body.pizza-theme {
+  background: linear-gradient(135deg, #ff6b6b 0%, #ee5a52 50%, #d63031 100%);
+  color: #fff;
+}
+
+body.pizza-theme .container {
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+  border-radius: 20px;
+  margin: 20px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+}
+
+/* Pizza header with image */
+.pizza-header {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 30px;
+}
+
+.pizza-image {
+  width: 200px;
+  height: auto;
+  border-radius: 15px;
+  margin-bottom: 20px;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+  border: 3px solid #fff;
+}
+
+/* Pizza-themed buttons */
+body.pizza-theme .startButton {
+  background: linear-gradient(45deg, #ff4757, #ff3742);
+  color: white;
+  border: 2px solid #fff;
+  box-shadow: 0 4px 15px rgba(255, 71, 87, 0.3);
+}
+
+body.pizza-theme .startButton:hover {
+  background: linear-gradient(45deg, #ff3742, #ff2f3a);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(255, 71, 87, 0.4);
+}
+
+body.pizza-theme button {
+  background: linear-gradient(45deg, #ff4757, #ff3742);
+  color: white;
+  border: 2px solid #fff;
+}
+
+body.pizza-theme button:hover {
+  background: linear-gradient(45deg, #ff3742, #ff2f3a);
+}
+
+/* Pizza-themed input */
+body.pizza-theme #answerInput {
+  background: rgba(255, 255, 255, 0.9);
+  border: 2px solid #ff4757;
+  color: #333;
+}
+
+body.pizza-theme #answerInput:focus {
+  border-color: #ff3742;
+  box-shadow: 0 0 10px rgba(255, 71, 87, 0.3);
+}
+
+/* Pizza-themed pills */
+body.pizza-theme .pill {
+  background-color: rgba(255, 255, 255, 0.3);
+  border: 1px solid rgba(255, 255, 255, 0.5);
+}
+
+body.pizza-theme .pill.correct {
+  background-color: #2ed573;
+  border-color: #2ed573;
+}
+
+body.pizza-theme .pill.incorrect {
+  background-color: #ff4757;
+  border-color: #ff4757;
+}
+
+/* Pizza-themed keypad */
+body.pizza-theme .key {
+  background: rgba(255, 255, 255, 0.9);
+  border: 2px solid #ff4757;
+  color: #333;
+}
+
+body.pizza-theme .key:hover {
+  background: #ff4757;
+  color: white;
+}
+
+/* Pizza-themed results */
+body.pizza-theme .heatmap-container {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 15px;
+  padding: 20px;
+  border: 2px solid rgba(255, 255, 255, 0.2);
+}
+
+body.pizza-theme .stats-panel {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 15px;
+  padding: 20px;
+  border: 2px solid rgba(255, 255, 255, 0.2);
+}
+
+/* Pizza-themed share button */
+body.pizza-theme .share-button {
+  background: linear-gradient(45deg, #ff4757, #ff3742);
+  border: 2px solid #fff;
+}
+
+body.pizza-theme .share-button:hover {
+  background: linear-gradient(45deg, #ff3742, #ff2f3a);
+}
+
+/* Pizza-themed footer */
+body.pizza-theme footer {
+  background: rgba(255, 255, 255, 0.1);
+  border-top: 2px solid rgba(255, 255, 255, 0.2);
+}
+
+body.pizza-theme footer a {
+  color: #fff;
+}
+
+body.pizza-theme footer a:hover {
+  color: #ffd700;
+}
