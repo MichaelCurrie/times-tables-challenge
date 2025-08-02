@@ -399,7 +399,7 @@ body.pizza-theme .container {
 }
 
 .pizza-image {
-  width: 200px;
+  width: 600px;
   height: auto;
   border-radius: 15px;
   margin-bottom: 20px;
@@ -508,4 +508,180 @@ body.pizza-theme footer a {
 
 body.pizza-theme footer a:hover {
   color: #ffd700;
+}
+
+/* ==========================================================================
+   Pizza Party Styles
+   ========================================================================== */
+
+/* Pizza buttons layout */
+.pizza-buttons {
+  display: flex;
+  gap: 20px;
+  margin-top: 20px;
+}
+
+.pizza-button {
+  appearance: none;
+  background: linear-gradient(45deg, #ff4757, #ff3742);
+  color: white;
+  border: 2px solid #fff;
+  border-radius: 15px;
+  box-sizing: border-box;
+  cursor: pointer;
+  display: inline-block;
+  font-family: Roobert, -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+  font-size: 18px;
+  font-weight: 600;
+  line-height: normal;
+  margin: 0;
+  min-height: 60px;
+  min-width: 150px;
+  outline: none;
+  padding: 16px 24px;
+  text-align: center;
+  text-decoration: none;
+  transition: all 300ms cubic-bezier(.23, 1, 0.32, 1);
+  user-select: none;
+  -webkit-user-select: none;
+  touch-action: manipulation;
+  will-change: transform;
+  box-shadow: 0 4px 15px rgba(255, 71, 87, 0.3);
+}
+
+.pizza-button:hover {
+  background: linear-gradient(45deg, #ff3742, #ff2f3a);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(255, 71, 87, 0.4);
+}
+
+.pizza-button:active {
+  box-shadow: none;
+  transform: translateY(0);
+}
+
+.back-button {
+  background: linear-gradient(45deg, #6c757d, #5a6268);
+  margin-top: 20px;
+}
+
+.back-button:hover {
+  background: linear-gradient(45deg, #5a6268, #495057);
+}
+
+/* Pizza form styles */
+.pizza-form {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  max-width: 400px;
+  margin: 0 auto;
+  padding: 20px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 15px;
+  border: 2px solid rgba(255, 255, 255, 0.2);
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.form-group label {
+  font-weight: 600;
+  color: #fff;
+  text-align: left;
+}
+
+.form-group input,
+.form-group select {
+  padding: 12px;
+  border: 2px solid #ff4757;
+  border-radius: 8px;
+  font-size: 16px;
+  background: rgba(255, 255, 255, 0.9);
+  color: #333;
+}
+
+.form-group input:focus,
+.form-group select:focus {
+  outline: none;
+  border-color: #ff3742;
+  box-shadow: 0 0 10px rgba(255, 71, 87, 0.3);
+}
+
+/* Container visibility */
+#eaterContainer,
+#plannerContainer,
+#plannerResultsContainer {
+  display: none;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  height: 100vh;
+  padding: 0 1rem;
+  box-sizing: border-box;
+}
+
+/* Party summary styles */
+.party-summary {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  max-width: 600px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+.summary-card {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 15px;
+  padding: 20px;
+  border: 2px solid rgba(255, 255, 255, 0.2);
+  text-align: left;
+}
+
+.summary-card h3 {
+  margin: 0 0 15px 0;
+  color: #fff;
+  font-size: 1.2em;
+}
+
+.summary-card div {
+  color: #fff;
+  line-height: 1.6;
+}
+
+#attendeesList {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.attendee-tag {
+  background: rgba(255, 255, 255, 0.2);
+  padding: 5px 10px;
+  border-radius: 20px;
+  font-size: 0.9em;
+}
+
+.topping-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 5px 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.topping-item:last-child {
+  border-bottom: none;
+}
+
+.topping-count {
+  background: rgba(255, 255, 255, 0.2);
+  padding: 2px 8px;
+  border-radius: 10px;
+  font-size: 0.8em;
 }

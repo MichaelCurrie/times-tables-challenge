@@ -46,6 +46,18 @@ def init_db():
       );
     """)
 
+    # Pizza party attendees
+    cur.execute("""
+      CREATE TABLE IF NOT EXISTS pizza_attendees (
+          id INTEGER PRIMARY KEY AUTOINCREMENT,
+          party_number INTEGER NOT NULL,
+          name TEXT NOT NULL,
+          slice_count INTEGER NOT NULL,
+          favorite_topping TEXT NOT NULL,
+          timestamp DATETIME DEFAULT CURRENT_TIMESTAMP
+      );
+    """)
+
     # Trigger to update agg_pair when a new response is inserted
     cur.execute("""
       CREATE TRIGGER IF NOT EXISTS trg_response_insert_agg_pair
@@ -172,6 +184,78 @@ def submit():
         "world_avg": world_avg,
         "world_count": world_count
     })
+
+@app.route("/pizza/join", methods=["POST"])
+def join_pizza_party():
+    data = request.get_json()
+    party_number = data.get("partyNumber")
+    name = data.get("name")
+    slice_count = data.get("sliceCount")
+    favorite_topping = data.get("favoriteTopping")
+
+    if not all([party_number, name, slice_count, favorite_topping]):
+        return jsonify({"error": "All fields are required"}), 400
+
+    conn = sqlite3.connect(DATABASE)
+    cur = conn.cursor()
+    
+    try:
+        cur.execute("""
+            INSERT INTO pizza_attendees (party_number, name, slice_count, favorite_topping)
+            VALUES (?, ?, ?, ?)
+        """, (party_number, name, slice_count, favorite_topping))
+        
+        conn.commit()
+        conn.close()
+        
+        return jsonify({"success": True, "message": "Successfully joined the pizza party!"})
+    except Exception as e:
+        conn.close()
+        return jsonify({"error": str(e)}), 500
+
+@app.route("/pizza/summary/<int:party_number>", methods=["GET"])
+def get_pizza_party_summary(party_number):
+    conn = sqlite3.connect(DATABASE)
+    cur = conn.cursor()
+    
+    try:
+        # Get all attendees for this party
+        cur.execute("""
+            SELECT name, slice_count, favorite_topping
+            FROM pizza_attendees
+            WHERE party_number = ?
+            ORDER BY timestamp
+        """, (party_number,))
+        
+        attendees = cur.fetchall()
+        
+        if not attendees:
+            return jsonify({"error": "No party found with that number"}), 404
+        
+        # Calculate totals
+        total_slices = sum(attendee[1] for attendee in attendees)
+        names = [attendee[0] for attendee in attendees]
+        
+        # Count toppings
+        topping_counts = {}
+        for attendee in attendees:
+            topping = attendee[2]
+            topping_counts[topping] = topping_counts.get(topping, 0) + 1
+        
+        # Get top 3 toppings
+        top_toppings = sorted(topping_counts.items(), key=lambda x: x[1], reverse=True)[:3]
+        
+        conn.close()
+        
+        return jsonify({
+            "party_number": party_number,
+            "attendees": names,
+            "total_slices": total_slices,
+            "top_toppings": top_toppings
+        })
+    except Exception as e:
+        conn.close()
+        return jsonify({"error": str(e)}), 500
 
 if __name__ == '__main__':
     app.run(debug=True)

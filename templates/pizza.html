@@ -12,91 +12,104 @@
             <div id="startScreen">
                 <div class="pizza-header">
                     <img src="{{ url_for('static', filename='pizza_family.png') }}" alt="Pizza Family" class="pizza-image">
-                    <h1>Slice to Meet You Pizza Picker</h1>
+                    <h1>Slice to Meet You Pizza Party</h1>
                 </div>
-                <p>Multiply integers (up to 12×12) as fast as you can!</p>
+                <p>Plan your perfect pizza party!</p>
                 <br>
-                <button class="startButton" id="startButton" aria-label="Start Challenge" role="button">
-                Start Challenge
-                </button>
+                <div class="pizza-buttons">
+                    <button class="pizza-button planner-button" id="plannerButton" aria-label="I'm a Planner" role="button">
+                        🍕 PLANNER
+                    </button>
+                    <button class="pizza-button eater-button" id="eaterButton" aria-label="I'm an Eater" role="button">
+                        🍽️ EATER
+                    </button>
+                </div>
             </div>
-            <!-- Question Screen -->
-            <div id="questionContainer">
-                <div id="progressContainer">
-                    <div class="pill" data-index="1"></div>
-                    <div class="pill" data-index="2"></div>
-                    <div class="pill" data-index="3"></div>
-                    <div class="pill" data-index="4"></div>
-                    <div class="pill" data-index="5"></div>
-                    <div class="pill" data-index="6"></div>
-                    <div class="pill" data-index="7"></div>
-                    <div class="pill" data-index="8"></div>
-                    <div class="pill" data-index="9"></div>
-                    <div class="pill" data-index="10"></div>
+            <!-- EATER Form Screen -->
+            <div id="eaterContainer">
+                <div class="pizza-header">
+                    <h2>🍽️ I'm an Eater</h2>
+                    <p>Join the pizza party!</p>
                 </div>
-                <h2 id="questionText"></h2>
-                <input type="number" id="answerInput" placeholder="Your answer">
-                <!-- On‑screen numeric keypad -->
-                <div id="keypad">
-                    <div class="key-row">
-                        <button class="key" data-key="1">1</button>
-                        <button class="key" data-key="2">2</button>
-                        <button class="key" data-key="3">3</button>
+                <form id="eaterForm" class="pizza-form">
+                    <div class="form-group">
+                        <label for="partyNumber">Pizza Party Number (1-100):</label>
+                        <input type="number" id="partyNumber" name="partyNumber" min="1" max="100" required>
                     </div>
-                    <div class="key-row">
-                        <button class="key" data-key="4">4</button>
-                        <button class="key" data-key="5">5</button>
-                        <button class="key" data-key="6">6</button>
+                    <div class="form-group">
+                        <label for="eaterName">Your Name:</label>
+                        <input type="text" id="eaterName" name="eaterName" required>
                     </div>
-                    <div class="key-row">
-                        <button class="key" data-key="7">7</button>
-                        <button class="key" data-key="8">8</button>
-                        <button class="key" data-key="9">9</button>
+                    <div class="form-group">
+                        <label for="sliceCount">How many slices do you want?</label>
+                        <input type="number" id="sliceCount" name="sliceCount" min="1" max="20" required>
                     </div>
-                    <div class="key-row">
-                        <button class="key" data-key="back">⌫</button>
-                        <button class="key" data-key="0">0</button>
-                        <button class="key" data-key="submit">Submit</button>
+                    <div class="form-group">
+                        <label for="favoriteTopping">Your Favorite Topping:</label>
+                        <select id="favoriteTopping" name="favoriteTopping" required>
+                            <option value="">Choose your topping...</option>
+                            <option value="pepperoni">Pepperoni</option>
+                            <option value="mushrooms">Mushrooms</option>
+                            <option value="sausage">Sausage</option>
+                            <option value="bacon">Bacon</option>
+                            <option value="ham">Ham</option>
+                            <option value="chicken">Chicken</option>
+                            <option value="beef">Beef</option>
+                            <option value="anchovies">Anchovies</option>
+                            <option value="olives">Olives</option>
+                            <option value="bell-peppers">Bell Peppers</option>
+                            <option value="onions">Onions</option>
+                            <option value="tomatoes">Tomatoes</option>
+                            <option value="pineapple">Pineapple</option>
+                            <option value="spinach">Spinach</option>
+                            <option value="artichokes">Artichokes</option>
+                            <option value="extra-cheese">Extra Cheese</option>
+                            <option value="vegan-cheese">Vegan Cheese</option>
+                            <option value="basil">Basil</option>
+                            <option value="garlic">Garlic</option>
+                        </select>
                     </div>
-                </div>
-                <br>
-                <button id="submitAnswerButton">Submit</button>
-                <p id="feedback"></p>
-                <p id="progress"></p>
+                    <button type="submit" class="pizza-button">Join the Party! 🍕</button>
+                </form>
+                <button id="backToHome" class="pizza-button back-button">← Back to Home</button>
             </div>
-            <!-- Results Screen -->
-            <div id="resultsContainer">
-                <div class="results-wrapper">
-                    <div class="heatmap-container">
-                        <h2>Multiplication Table Heatmap<br>
-                            <small>Average Effective Time (s)</small>
-                        </h2>
-                        <div id="heatmap"></div>
+            <!-- PLANNER Form Screen -->
+            <div id="plannerContainer">
+                <div class="pizza-header">
+                    <h2>🍕 I'm a Planner</h2>
+                    <p>Check your pizza party status!</p>
+                </div>
+                <form id="plannerForm" class="pizza-form">
+                    <div class="form-group">
+                        <label for="plannerPartyNumber">Pizza Party Number (1-100):</label>
+                        <input type="number" id="plannerPartyNumber" name="plannerPartyNumber" min="1" max="100" required>
+                    </div>
+                    <button type="submit" class="pizza-button">Check Party Status! 🍕</button>
+                </form>
+                <button id="backToHomePlanner" class="pizza-button back-button">← Back to Home</button>
+            </div>
+
+            <!-- PLANNER Results Screen -->
+            <div id="plannerResultsContainer">
+                <div class="pizza-header">
+                    <h2>🍕 Pizza Party Summary</h2>
+                    <p>Party #<span id="partyNumberDisplay"></span></p>
+                </div>
+                <div class="party-summary">
+                    <div class="summary-card">
+                        <h3>👥 Attendees</h3>
+                        <div id="attendeesList"></div>
+                    </div>
+                    <div class="summary-card">
+                        <h3>🍕 Total Slices</h3>
+                        <div id="totalSlices"></div>
+                    </div>
+                    <div class="summary-card">
+                        <h3>🏆 Top 3 Favorite Toppings</h3>
+                        <div id="topToppings"></div>
                     </div>
                 </div>
-                <div class="stats-panel">
-                    <h3>Your Stats vs. The World</h3>
-                    <p id="yourAverage">Response Time: -- s vs. -- s</p>
-                    <p id="yourCount">Answers Submitted: -- / --</p>
-                </div>
-                <button id="shareStatsButton" class="share-button">
-                    <svg
-                        class="share-icon"
-                        width="24"
-                        height="24"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        xmlns="http://www.w3.org/2000/svg"
-                        >
-                        <path
-                            d="M18 16.08C17.24 16.08 16.56 16.38 16.05 16.88L8.91 12.7C8.96 12.47 9 12.24 9 12C9 11.76 8.96 11.53 8.91 11.3L15.96 7.18C16.5 7.69 17.22 8 18 8C19.66 8 21 6.66 21 5C21 3.34 19.66 2 18 2C16.34 2 15 3.34 15 5C15 5.24 15.04 5.47 15.09 5.7L8.04 9.82C7.5 9.31 6.78 9 6 9C4.34 9 3 10.34 3 12C3 13.66 4.34 15 6 15C6.78 15 7.5 14.69 8.04 14.18L15.16 18.36C15.11 18.58 15.08 18.79 15.08 19C15.08 20.66 16.42 22 18.08 22C19.74 22 21.08 20.66 21.08 19C21.08 17.34 19.74 16 18.08 16Z"
-                            fill="currentColor"
-                            />
-                    </svg>
-                    <span>Share Stats</span>
-                </button>
-                <br>
-                <button id="restartButton">Restart Challenge</button>
+                <button id="backToPlanner" class="pizza-button back-button">← Back to Planner</button>
             </div>
             <footer id="siteFooter">
                 <a href="https://twitter.com/michaelbcurrie" target="_blank">
@@ -107,6 +120,6 @@
                 </a>
             </footer>
         </div>
-        <script src="{{ url_for('static', filename='script.js') }}"></script>
+        <script src="{{ url_for('static', filename='pizza.js') }}"></script>
     </body>
 </html> 
