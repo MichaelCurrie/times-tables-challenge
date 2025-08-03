@@ -210,21 +210,23 @@ document.addEventListener("DOMContentLoaded", function () {
 
       const result = await response.json();
 
-      if (result.success) {
-        if (result.override) {
-          // Show override screen
-          document.getElementById("overrideMessage").textContent =
-            result.override.message;
-          document.getElementById("overrideImage").src = result.override.image;
-          showScreen(overrideContainer);
-        } else {
-          alert("Successfully joined the pizza party! 🍕");
-          eaterForm.reset();
-          showScreen(startScreen);
-        }
-      } else {
-        alert("Error: " + result.error);
-      }
+             if (result.success) {
+         console.log("Join result:", result); // Debug log
+         if (result.override) {
+           console.log("Override triggered:", result.override); // Debug log
+           // Show override screen
+           document.getElementById("overrideMessage").textContent =
+             result.override.message;
+           document.getElementById("overrideImage").src = result.override.image;
+           showScreen(overrideContainer);
+         } else {
+           alert("Successfully joined the pizza party! 🍕");
+           eaterForm.reset();
+           showScreen(startScreen);
+         }
+       } else {
+         alert("Error: " + result.error);
+       }
     } catch (error) {
       alert("Error joining party: " + error.message);
     }

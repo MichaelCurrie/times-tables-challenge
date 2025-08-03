@@ -238,8 +238,10 @@ def join_pizza_party() -> Dict[str, Any]:
 
         # Check for attendee overrides
         override_info = None
+        print(f"DEBUG: Checking overrides for name: {name}")  # Debug log
         for override in ATTENDEE_OVERRIDES:
             if name in override["names"]:
+                print(f"DEBUG: Found override for {name}")  # Debug log
                 # Check if Evelyn is already in this party
                 cur.execute(
                     """
@@ -250,6 +252,7 @@ def join_pizza_party() -> Dict[str, Any]:
                 )
 
                 evelyn_attendee = cur.fetchone()
+                print(f"DEBUG: Evelyn attendee found: {evelyn_attendee}")  # Debug log
                 if evelyn_attendee:
                     override_info = override
                     # Get Evelyn's preferences
@@ -260,7 +263,11 @@ def join_pizza_party() -> Dict[str, Any]:
                     """,
                         (evelyn_attendee[0],),
                     )
-                    preferences = dict(cur.fetchall())
+                    evelyn_preferences = dict(cur.fetchall())
+                    print(f"DEBUG: Evelyn preferences: {evelyn_preferences}")  # Debug log
+                    # Override the current preferences with Evelyn's preferences
+                    preferences = evelyn_preferences
+                    print(f"DEBUG: Override triggered!")  # Debug log
                     break
 
         # Insert attendee
