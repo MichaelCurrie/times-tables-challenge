@@ -640,6 +640,56 @@ footer svg {
   background: linear-gradient(45deg, #7d3c98, #8e44ad);
 }
 
+/* Pizza order styling by source */
+.pizza-order {
+  background: #f8f9fa;
+  border: 2px solid #e9ecef;
+  border-radius: 8px;
+  padding: 15px;
+  margin-bottom: 15px;
+  transition: all 0.3s ease;
+}
+
+.pizza-order:hover {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  transform: translateY(-2px);
+}
+
+.pizza-boring_basic {
+  border-left: 5px solid #fd7e14;
+  background: linear-gradient(90deg, #fff3e0 0%, #f8f9fa 20%);
+}
+
+.pizza-custom {
+  border-left: 5px solid #8e44ad;
+  background: linear-gradient(90deg, #f3e5f5 0%, #f8f9fa 20%);
+}
+
+.pizza-ai_generated {
+  border-left: 5px solid #20c997;
+  background: linear-gradient(90deg, #e6fffa 0%, #f8f9fa 20%);
+}
+
+.pizza-order h4 {
+  color: #333;
+  margin: 0 0 10px 0;
+  font-size: 18px;
+}
+
+.pizza-description {
+  color: #666;
+  font-style: italic;
+  margin-bottom: 10px;
+}
+
+.calculation-method {
+  font-size: 12px;
+  color: #6c757d;
+  border-top: 1px solid #e9ecef;
+  padding-top: 10px;
+  margin-top: 10px;
+}
+
 /* Ingredient checkboxes styling */
 .ingredient-checkboxes {
   display: flex;

@@ -62,6 +62,15 @@ CREATE TABLE IF NOT EXISTS named_pizzas_ingredients (
     FOREIGN KEY (pizza_id) REFERENCES named_pizzas (id) ON DELETE CASCADE
 );
 
+-- Existing pizza selections by attendees
+CREATE TABLE IF NOT EXISTS pizza_selections (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    attendee_id INTEGER NOT NULL,
+    pizza_type TEXT NOT NULL,
+    slice_count INTEGER NOT NULL,
+    FOREIGN KEY (attendee_id) REFERENCES pizza_attendees (id) ON DELETE CASCADE
+);
+
 -- Trigger to update agg_pair when a new response is inserted
 CREATE TRIGGER IF NOT EXISTS trg_response_insert_agg_pair
 AFTER INSERT ON responses

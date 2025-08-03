@@ -305,9 +305,11 @@ def join_pizza_party() -> Dict[str, Any]:
                         (boss[0],),
                     )
                     evelyn_preferences = dict(cur.fetchall())
-                    print(f"DEBUG: Evelyn preferences: {bosspreferences}")  # Debug log
+                    print(
+                        f"DEBUG: Evelyn preferences: {evelyn_preferences}"
+                    )  # Debug log
                     # Override the current preferences with the Boss's preferences
-                    preferences = boss_preferences
+                    preferences = evelyn_preferences
                     print(
                         f"DEBUG: Preference override triggered from {name} -> {override['trigger_name']}!"
                     )  # Debug log
@@ -334,6 +336,17 @@ def join_pizza_party() -> Dict[str, Any]:
             """,
                 (attendee_id, ingredient, preference),
             )
+
+        # Insert existing pizza selections
+        for pizza_type, slice_count in existing_pizza_slices.items():
+            if slice_count > 0:
+                cur.execute(
+                    """
+                    INSERT INTO pizza_selections (attendee_id, pizza_type, slice_count)
+                    VALUES (?, ?, ?)
+                """,
+                    (attendee_id, pizza_type, slice_count),
+                )
 
         conn.commit()
         conn.close()
@@ -634,8 +647,13 @@ def get_pizza_party_summary(party_id: str) -> Dict[str, Any]:
             ingredient_scores[ingredient].append(preference)
 
         # Calculate optimal pizza orders with attendee assignments
-        pizza_orders = calculate_pizza_orders(
+        ai_generated_orders = calculate_pizza_orders(
             attendees, ingredient_scores, preferences_data
+        )
+
+        # Calculate comprehensive pizza orders including existing selections
+        comprehensive_pizza_orders = calculate_comprehensive_pizza_orders(
+            party_id, attendees, preferences_data, cur
         )
 
         # Get top 3 most wanted ingredients
@@ -659,7 +677,8 @@ def get_pizza_party_summary(party_id: str) -> Dict[str, Any]:
                 "attendees": names,
                 "total_slices": total_slices,
                 "top_ingredients": top_3_ingredients,
-                "pizza_orders": pizza_orders,
+                "pizza_orders": ai_generated_orders,  # Keep the AI-generated orders for backward compatibility
+                "comprehensive_pizza_orders": comprehensive_pizza_orders,  # New comprehensive orders
                 "preference_collections": formatted_collections,
             }
         )
@@ -817,6 +836,170 @@ def calculate_pizza_orders(
             )
 
     return pizza_orders
+
+
+def calculate_comprehensive_pizza_orders(
+    party_id: str,
+    attendees: List[Tuple[int, str, int]],
+    preferences_data: List[Tuple[int, str, int]],
+    cur,
+) -> List[Dict[str, Any]]:
+    """
+    Calculate comprehensive pizza orders including existing selections, custom pizzas, and AI recommendations.
+
+    Args:
+        party_id (str): The party ID
+        attendees (List[Tuple[int, str, int]]): List of attendee data
+        preferences_data (List[Tuple[int, str, int]]): Raw preference data
+        cur: Database cursor
+
+    Returns:
+        List[Dict[str, Any]]: Comprehensive list of pizza orders with source information
+    """
+    comprehensive_orders = []
+
+    # Create attendee preferences and names lookup
+    attendee_preferences = {}
+    attendee_names = {attendee[0]: attendee[1] for attendee in attendees}
+
+    for attendee_id, ingredient, preference in preferences_data:
+        if attendee_id not in attendee_preferences:
+            attendee_preferences[attendee_id] = {}
+        attendee_preferences[attendee_id][ingredient] = preference
+
+    # Helper function to find who will enjoy a pizza
+    def get_pizza_eaters(pizza_ingredients: List[str]) -> List[str]:
+        eaters = []
+        for attendee_id, prefs in attendee_preferences.items():
+            can_eat = True
+            wants_it = False
+
+            for ingredient in pizza_ingredients:
+                if prefs.get(ingredient, 1) == 0:  # Will not eat
+                    can_eat = False
+                    break
+                elif prefs.get(ingredient, 1) == 2:  # Wants it
+                    wants_it = True
+
+            # Include if they can eat it and either want it or are indifferent to all ingredients
+            if can_eat and (wants_it or len(pizza_ingredients) == 0):
+                eaters.append(attendee_names[attendee_id])
+            elif (
+                can_eat and not pizza_ingredients
+            ):  # Plain cheese - everyone who can eat it
+                eaters.append(attendee_names[attendee_id])
+
+        return eaters
+
+    # 1. Get existing pizza selections (boring basic pizzas)
+    attendee_ids = [attendee[0] for attendee in attendees]
+    if attendee_ids:
+        placeholders = ",".join(["?" for _ in attendee_ids])
+        cur.execute(
+            f"""
+            SELECT ps.pizza_type, SUM(ps.slice_count) as total_slices,
+                   GROUP_CONCAT(pa.name, ', ') as eater_names
+            FROM pizza_selections ps
+            JOIN pizza_attendees pa ON ps.attendee_id = pa.id
+            WHERE ps.attendee_id IN ({placeholders})
+            GROUP BY ps.pizza_type
+            """,
+            attendee_ids,
+        )
+
+        existing_selections = cur.fetchall()
+
+        # Map pizza type IDs to their ingredients
+        pizza_type_ingredients = {
+            "pepperoni": ["pepperoni"],
+            "cheese": [],
+            "pineapple-ham": ["pineapple", "ham"],
+            "spinach-tomato-pineapple": ["spinach", "tomatoes", "pineapple"],
+        }
+
+        # Add existing pizza orders
+        for pizza_type, total_slices, eater_names in existing_selections:
+            if total_slices > 0:
+                ingredients = pizza_type_ingredients.get(pizza_type, [])
+                pizza_name = pizza_type.replace("-", " ").title()
+
+                comprehensive_orders.append(
+                    {
+                        "type": f"{pizza_name} (Boring Basic)",
+                        "ingredients": ingredients,
+                        "slices": total_slices,
+                        "description": f"Pre-selected {pizza_name.lower()} pizza",
+                        "target_eaters": eater_names.split(", ") if eater_names else [],
+                        "source": "boring_basic",
+                        "calculation_method": "Selected by attendees from boring basic pizza options",
+                    }
+                )
+
+    # 2. Get custom pizzas and their selections
+    cur.execute(
+        """
+        SELECT np.name, GROUP_CONCAT(npi.ingredient, ',') as ingredients
+        FROM named_pizzas np
+        LEFT JOIN named_pizzas_ingredients npi ON np.id = npi.pizza_id
+        GROUP BY np.id, np.name
+        ORDER BY np.timestamp DESC
+        """
+    )
+
+    custom_pizzas_data = cur.fetchall()
+
+    # Check if any attendees selected custom pizzas
+    for pizza_name, ingredients_str in custom_pizzas_data:
+        ingredients = ingredients_str.split(",") if ingredients_str else []
+        custom_pizza_id = f"custom_{pizza_name.lower().replace(' ', '_')}"
+
+        # Check if anyone selected this custom pizza
+        cur.execute(
+            f"""
+            SELECT SUM(ps.slice_count) as total_slices,
+                   GROUP_CONCAT(pa.name, ', ') as eater_names
+            FROM pizza_selections ps
+            JOIN pizza_attendees pa ON ps.attendee_id = pa.id
+            WHERE ps.pizza_type = ? AND ps.attendee_id IN ({placeholders})
+            """,
+            [custom_pizza_id] + attendee_ids,
+        )
+
+        custom_selection = cur.fetchone()
+        if custom_selection and custom_selection[0] and custom_selection[0] > 0:
+            comprehensive_orders.append(
+                {
+                    "type": f"{pizza_name} (Custom)",
+                    "ingredients": ingredients,
+                    "slices": custom_selection[0],
+                    "description": f"Custom created pizza: {pizza_name}",
+                    "target_eaters": (
+                        custom_selection[1].split(", ") if custom_selection[1] else []
+                    ),
+                    "source": "custom",
+                    "calculation_method": "Created by community, selected by attendees",
+                }
+            )
+
+    # 3. Add AI-generated recommendations
+    # Organize preferences by ingredient for AI calculation
+    ingredient_scores = {}
+    for attendee_id, ingredient, preference in preferences_data:
+        if ingredient not in ingredient_scores:
+            ingredient_scores[ingredient] = []
+        ingredient_scores[ingredient].append(preference)
+
+    ai_orders = calculate_pizza_orders(attendees, ingredient_scores, preferences_data)
+
+    for ai_order in ai_orders:
+        ai_order["source"] = "ai_generated"
+        ai_order["calculation_method"] = (
+            "AI-optimized based on attendee preferences and slice requirements"
+        )
+        ai_order["type"] = f"{ai_order['type']} (AI Recommended)"
+        comprehensive_orders.append(ai_order)
+
+    return comprehensive_orders
 
 
 if __name__ == "__main__":

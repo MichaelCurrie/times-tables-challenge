@@ -1153,9 +1153,48 @@ document.addEventListener("DOMContentLoaded", function () {
         "<p>No preference collections available.</p>";
     }
 
-    // Display pizza orders if available
-    if (data.pizza_orders && data.pizza_orders.length > 0) {
+    // Display comprehensive pizza orders if available
+    if (
+      data.comprehensive_pizza_orders &&
+      data.comprehensive_pizza_orders.length > 0
+    ) {
       // Add pizza orders section if it doesn't exist
+      let pizzaOrdersSection = document.getElementById("pizzaOrders");
+      if (!pizzaOrdersSection) {
+        const summaryContainer = document.querySelector(".party-summary");
+        const pizzaOrdersDiv = document.createElement("div");
+        pizzaOrdersDiv.className = "summary-card";
+        pizzaOrdersDiv.innerHTML = `
+                    <h3>🍕 Complete Pizza Orders</h3>
+                    <div id="pizzaOrders"></div>
+                `;
+        summaryContainer.appendChild(pizzaOrdersDiv);
+      }
+
+      pizzaOrdersSection = document.getElementById("pizzaOrders");
+      pizzaOrdersSection.innerHTML = data.comprehensive_pizza_orders
+        .map(
+          (pizza) =>
+            `<div class="pizza-order pizza-${pizza.source}">
+                    <h4>${pizza.type}</h4>
+                    <p class="pizza-description">${pizza.description}</p>
+                    ${
+                      pizza.ingredients.length > 0
+                        ? `<p><strong>Ingredients:</strong> ${pizza.ingredients.join(", ")}</p>`
+                        : "<p><strong>Ingredients:</strong> Cheese only</p>"
+                    }
+                    <p><strong>Slices:</strong> ${pizza.slices}</p>
+                    ${
+                      pizza.target_eaters && pizza.target_eaters.length > 0
+                        ? `<p><strong>Target Eaters:</strong> ${pizza.target_eaters.join(", ")}</p>`
+                        : "<p><strong>Target Eaters:</strong> Everyone</p>"
+                    }
+                    <p class="calculation-method"><em>Calculation:</em> ${pizza.calculation_method}</p>
+                </div>`,
+        )
+        .join("");
+    } else if (data.pizza_orders && data.pizza_orders.length > 0) {
+      // Fallback to old pizza orders format for backward compatibility
       let pizzaOrdersSection = document.getElementById("pizzaOrders");
       if (!pizzaOrdersSection) {
         const summaryContainer = document.querySelector(".party-summary");
@@ -1179,6 +1218,11 @@ document.addEventListener("DOMContentLoaded", function () {
                       pizza.ingredients.length > 0
                         ? `<p><strong>Ingredients:</strong> ${pizza.ingredients.join(", ")}</p>`
                         : "<p><strong>Ingredients:</strong> Cheese only</p>"
+                    }
+                    ${
+                      pizza.target_eaters && pizza.target_eaters.length > 0
+                        ? `<p><strong>Target Eaters:</strong> ${pizza.target_eaters.join(", ")}</p>`
+                        : ""
                     }
                 </div>`,
         )
