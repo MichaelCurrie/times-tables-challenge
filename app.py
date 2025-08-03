@@ -188,13 +188,17 @@ def submit():
 @app.route("/pizza/join", methods=["POST"])
 def join_pizza_party():
     data = request.get_json()
-    party_number = data.get("partyNumber")
+    party_id = data.get("partyNumber")
     name = data.get("name")
     slice_count = data.get("sliceCount")
     favorite_topping = data.get("favoriteTopping")
 
-    if not all([party_number, name, slice_count, favorite_topping]):
+    if not all([party_id, name, slice_count, favorite_topping]):
         return jsonify({"error": "All fields are required"}), 400
+    
+    # Validate party ID format (4 characters, letters and numbers)
+    if not party_id or len(party_id) != 4 or not party_id.isalnum():
+        return jsonify({"error": "Party ID must be exactly 4 characters (letters and numbers)"}), 400
 
     conn = sqlite3.connect(DATABASE)
     cur = conn.cursor()
@@ -203,7 +207,7 @@ def join_pizza_party():
         cur.execute("""
             INSERT INTO pizza_attendees (party_number, name, slice_count, favorite_topping)
             VALUES (?, ?, ?, ?)
-        """, (party_number, name, slice_count, favorite_topping))
+        """, (party_id.upper(), name, slice_count, favorite_topping))
         
         conn.commit()
         conn.close()
@@ -213,8 +217,12 @@ def join_pizza_party():
         conn.close()
         return jsonify({"error": str(e)}), 500
 
-@app.route("/pizza/summary/<int:party_number>", methods=["GET"])
-def get_pizza_party_summary(party_number):
+@app.route("/pizza/summary/<party_id>", methods=["GET"])
+def get_pizza_party_summary(party_id):
+    # Validate party ID format
+    if not party_id or len(party_id) != 4 or not party_id.isalnum():
+        return jsonify({"error": "Invalid party ID format"}), 400
+    
     conn = sqlite3.connect(DATABASE)
     cur = conn.cursor()
     
@@ -225,12 +233,12 @@ def get_pizza_party_summary(party_number):
             FROM pizza_attendees
             WHERE party_number = ?
             ORDER BY timestamp
-        """, (party_number,))
+        """, (party_id.upper(),))
         
         attendees = cur.fetchall()
         
         if not attendees:
-            return jsonify({"error": "No party found with that number"}), 404
+            return jsonify({"error": "No party found with that ID"}), 404
         
         # Calculate totals
         total_slices = sum(attendee[1] for attendee in attendees)
@@ -248,7 +256,7 @@ def get_pizza_party_summary(party_number):
         conn.close()
         
         return jsonify({
-            "party_number": party_number,
+            "party_number": party_id.upper(),
             "attendees": names,
             "total_slices": total_slices,
             "top_toppings": top_toppings

@@ -56,8 +56,16 @@ document.addEventListener('DOMContentLoaded', function() {
         e.preventDefault();
         
         const formData = new FormData(eaterForm);
+        const partyId = formData.get('partyNumber');
+        
+        // Validate party ID format
+        if (!partyId || partyId.length !== 4 || !/^[A-Za-z0-9]{4}$/.test(partyId)) {
+            alert('Party ID must be exactly 4 characters (letters and numbers)');
+            return;
+        }
+        
         const data = {
-            partyNumber: parseInt(formData.get('partyNumber')),
+            partyNumber: partyId,
             name: formData.get('eaterName'),
             sliceCount: parseInt(formData.get('sliceCount')),
             favoriteTopping: formData.get('favoriteTopping')
@@ -91,10 +99,16 @@ document.addEventListener('DOMContentLoaded', function() {
         e.preventDefault();
         
         const formData = new FormData(plannerForm);
-        const partyNumber = parseInt(formData.get('plannerPartyNumber'));
+        const partyId = formData.get('plannerPartyNumber');
+        
+        // Validate party ID format
+        if (!partyId || partyId.length !== 4 || !/^[A-Za-z0-9]{4}$/.test(partyId)) {
+            alert('Party ID must be exactly 4 characters (letters and numbers)');
+            return;
+        }
 
         try {
-            const response = await fetch(`/pizza/summary/${partyNumber}`);
+            const response = await fetch(`/pizza/summary/${partyId}`);
             const result = await response.json();
             
             if (response.ok) {

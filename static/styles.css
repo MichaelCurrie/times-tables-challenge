@@ -405,11 +405,11 @@ body.pizza-theme .container {
   text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
   margin: 0;
   text-align: center;
-  background: rgba(255, 255, 255, 0.05);
-  backdrop-filter: blur(5px);
+  background: rgba(255, 255, 255, 0.02);
+  backdrop-filter: blur(2px);
   padding: 20px 30px;
   border-radius: 15px;
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.05);
   box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
 }
 
@@ -563,11 +563,11 @@ body.pizza-theme footer a:hover {
   display: flex;
   gap: 20px;
   margin-top: 10px;
-  background: rgba(255, 255, 255, 0.05);
-  backdrop-filter: blur(5px);
+  background: rgba(255, 255, 255, 0.02);
+  backdrop-filter: blur(2px);
   padding: 20px;
   border-radius: 15px;
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.05);
   box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
 }
 
