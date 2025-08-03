@@ -621,8 +621,8 @@ def get_pizza_party_summary(party_id: str) -> Dict[str, Any]:
                 ingredient_scores[ingredient] = []
             ingredient_scores[ingredient].append(preference)
 
-        # Calculate optimal pizza orders
-        pizza_orders = calculate_pizza_orders(attendees, ingredient_scores)
+        # Calculate optimal pizza orders with attendee assignments
+        pizza_orders = calculate_pizza_orders(attendees, ingredient_scores, preferences_data)
 
         # Get top 3 most wanted ingredients
         top_ingredients = []
@@ -655,7 +655,7 @@ def get_pizza_party_summary(party_id: str) -> Dict[str, Any]:
 
 
 def calculate_pizza_orders(
-    attendees: List[Tuple[int, str, int]], ingredient_scores: Dict[str, List[int]]
+    attendees: List[Tuple[int, str, int]], ingredient_scores: Dict[str, List[int]], preferences_data: List[Tuple[int, str, int]]
 ) -> List[Dict[str, Any]]:
     """
     Calculate optimal pizza orders based on attendee preferences.
@@ -671,6 +671,8 @@ def calculate_pizza_orders(
             to lists of preference scores for each attendee.
             Preference values: 0 = will not eat, 1 = indifferent, 2 = want to eat
             Example: {"pepperoni": [2, 1, 0, 2], "mushrooms": [1, 2, 1, 1]}
+        preferences_data (List[Tuple[int, str, int]]): Raw preference data
+            Each tuple contains: (attendee_id: int, ingredient: str, preference: int)
 
     Returns:
         List[Dict[str, Any]]: List of pizza order dictionaries, each containing:
@@ -678,6 +680,7 @@ def calculate_pizza_orders(
             - "ingredients" (List[str]): List of ingredient names on this pizza
             - "slices" (int): Number of slices (always 10)
             - "description" (str): Human-readable description of the pizza
+            - "target_eaters" (List[str]): Names of attendees who will enjoy this pizza
 
     Algorithm:
         1. Calculate total slices needed and required pizzas (10 slices per pizza)
@@ -685,9 +688,41 @@ def calculate_pizza_orders(
         3. Always include a plain cheese pizza for everyone
         4. Create specialty pizzas for highly preferred ingredients (score > 0.2)
         5. If space allows, create combination pizzas with top ingredients
+        6. Determine who will eat each pizza based on preferences
     """
     total_slices = sum(attendee[2] for attendee in attendees)
     total_pizzas_needed = (total_slices + 9) // 10  # Round up
+
+    # Create attendee preferences lookup
+    attendee_preferences = {}
+    attendee_names = {attendee[0]: attendee[1] for attendee in attendees}
+    
+    for attendee_id, ingredient, preference in preferences_data:
+        if attendee_id not in attendee_preferences:
+            attendee_preferences[attendee_id] = {}
+        attendee_preferences[attendee_id][ingredient] = preference
+
+    # Helper function to find who will enjoy a pizza
+    def get_pizza_eaters(pizza_ingredients: List[str]) -> List[str]:
+        eaters = []
+        for attendee_id, prefs in attendee_preferences.items():
+            can_eat = True
+            wants_it = False
+            
+            for ingredient in pizza_ingredients:
+                if prefs.get(ingredient, 1) == 0:  # Will not eat
+                    can_eat = False
+                    break
+                elif prefs.get(ingredient, 1) == 2:  # Wants it
+                    wants_it = True
+            
+            # Include if they can eat it and either want it or are indifferent to all ingredients
+            if can_eat and (wants_it or len(pizza_ingredients) == 0):
+                eaters.append(attendee_names[attendee_id])
+            elif can_eat and not pizza_ingredients:  # Plain cheese - everyone who can eat it
+                eaters.append(attendee_names[attendee_id])
+        
+        return eaters
 
     # Calculate ingredient popularity scores
     ingredient_popularity: Dict[str, float] = {}
@@ -709,12 +744,14 @@ def calculate_pizza_orders(
     pizza_orders: List[Dict[str, Any]] = []
 
     # Plain cheese pizza (always needed)
+    cheese_eaters = get_pizza_eaters([])
     pizza_orders.append(
         {
             "type": "Plain Cheese",
             "ingredients": [],
             "slices": 10,
             "description": "Classic cheese pizza for everyone",
+            "target_eaters": cheese_eaters,
         }
     )
 
@@ -729,12 +766,14 @@ def calculate_pizza_orders(
             break
 
         if score > 0.2:  # Only create if significantly wanted
+            ingredient_eaters = get_pizza_eaters([ingredient])
             pizza_orders.append(
                 {
                     "type": f"{ingredient.title()} Pizza",
                     "ingredients": [ingredient],
                     "slices": 10,
                     "description": f"Pizza with {ingredient} topping",
+                    "target_eaters": ingredient_eaters,
                 }
             )
             specialty_pizzas_created += 1
@@ -747,12 +786,15 @@ def calculate_pizza_orders(
             ing for ing, score in sorted_ingredients[:4] if score > 0.1
         ]
         if len(top_ingredients) >= 2:
+            supreme_ingredients = top_ingredients[:3]  # Max 3 ingredients per combo
+            supreme_eaters = get_pizza_eaters(supreme_ingredients)
             pizza_orders.append(
                 {
                     "type": "Supreme Pizza",
-                    "ingredients": top_ingredients[:3],  # Max 3 ingredients per combo
+                    "ingredients": supreme_ingredients,
                     "slices": 10,
-                    "description": f"Combination pizza with {', '.join(top_ingredients[:3])}",
+                    "description": f"Combination pizza with {', '.join(supreme_ingredients)}",
+                    "target_eaters": supreme_eaters,
                 }
             )
 
