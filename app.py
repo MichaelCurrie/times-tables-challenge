@@ -1,19 +1,20 @@
 from flask import Flask, request, jsonify, render_template
 import sqlite3
 import os
+from typing import List, Dict, Tuple, Optional, Any
 
 app = Flask(__name__)
 DATABASE = "data.db"
 
 # Available pizza ingredients
-PIZZA_INGREDIENTS = [
+PIZZA_INGREDIENTS: List[str] = [
     "pepperoni", "mushrooms", "sausage", "bacon", "ham", "chicken", "beef", 
     "anchovies", "olives", "bell-peppers", "onions", "tomatoes", "pineapple", 
     "spinach", "artichokes", "extra-cheese", "vegan-cheese", "basil", "garlic"
 ]
 
 # Attendee overrides for special cases
-ATTENDEE_OVERRIDES = [
+ATTENDEE_OVERRIDES: List[Dict[str, Any]] = [
     {
         "names": ["Stephen", "Andrew", "Alex", "Vanessa", "Brynn", "Dominic", "Benjamin", "Bridget", "Holly"],
         "trigger_name": "Evelyn",
@@ -22,111 +23,29 @@ ATTENDEE_OVERRIDES = [
     }
 ]
 
-def init_db():
+def init_db() -> None:
+    """Initialize the database with all required tables and triggers."""
     conn = sqlite3.connect(DATABASE)
     cur = conn.cursor()
 
-    # All responses from all users
-    cur.execute("""
-      CREATE TABLE IF NOT EXISTS responses (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        user_id TEXT NOT NULL,
-        a INTEGER,
-        b INTEGER,
-        user_answer INTEGER,
-        correct INTEGER,  -- 1 for True, 0 for False
-        time_taken REAL,
-        effective_time REAL,
-        timestamp DATETIME DEFAULT CURRENT_TIMESTAMP
-      );
-    """)
-
-    # Aggregated stats for each multiplication pair
-    cur.execute("""
-      CREATE TABLE IF NOT EXISTS agg_pair (
-          a INTEGER,
-          b INTEGER,
-          total_effective_time REAL,
-          count INTEGER,
-          wrong_count INTEGER,
-          PRIMARY KEY (a, b)
-      );
-    """)
-
-    # Aggregated overall stats for each user
-    cur.execute("""
-      CREATE TABLE IF NOT EXISTS agg_user (
-          user_id TEXT PRIMARY KEY,
-          total_effective_time REAL,
-          count INTEGER,
-          wrong_count INTEGER
-      );
-    """)
-
-    # Pizza party attendees
-    cur.execute("""
-      CREATE TABLE IF NOT EXISTS pizza_attendees (
-          id INTEGER PRIMARY KEY AUTOINCREMENT,
-          party_number TEXT NOT NULL,
-          name TEXT NOT NULL,
-          slice_count INTEGER NOT NULL,
-          timestamp DATETIME DEFAULT CURRENT_TIMESTAMP
-      );
-    """)
-
-    # Pizza ingredient preferences
-    cur.execute("""
-      CREATE TABLE IF NOT EXISTS pizza_preferences (
-          id INTEGER PRIMARY KEY AUTOINCREMENT,
-          attendee_id INTEGER NOT NULL,
-          ingredient TEXT NOT NULL,
-          preference INTEGER NOT NULL, -- 0: will not eat, 1: indifferent, 2: want to eat
-          FOREIGN KEY (attendee_id) REFERENCES pizza_attendees (id) ON DELETE CASCADE
-      );
-    """)
-
-    # Trigger to update agg_pair when a new response is inserted
-    cur.execute("""
-      CREATE TRIGGER IF NOT EXISTS trg_response_insert_agg_pair
-      AFTER INSERT ON responses
-      BEGIN
-          -- Try updating an existing record.
-          UPDATE agg_pair 
-            SET total_effective_time = total_effective_time + NEW.effective_time,
-                count = count + 1,
-                wrong_count = wrong_count + (CASE WHEN NEW.correct = 0 THEN 1 ELSE 0 END)
-            WHERE a = NEW.a AND b = NEW.b;
-          
-          -- If no row was updated, insert a new record.
-          INSERT OR IGNORE INTO agg_pair (a, b, total_effective_time, count, wrong_count)
-            VALUES (NEW.a, NEW.b, NEW.effective_time, 1, (CASE WHEN NEW.correct = 0 THEN 1 ELSE 0 END));
-      END;
-    """)
-
-    # Trigger to update agg_user when a new response is inserted
-    cur.execute("""
-      CREATE TRIGGER IF NOT EXISTS trg_response_insert_agg_user
-      AFTER INSERT ON responses
-      BEGIN
-          -- Try updating an existing record.
-          UPDATE agg_user 
-            SET total_effective_time = total_effective_time + NEW.effective_time,
-                count = count + 1,
-                wrong_count = wrong_count + (CASE WHEN NEW.correct = 0 THEN 1 ELSE 0 END)
-            WHERE user_id = NEW.user_id;
-          
-          -- If no row was updated, insert a new record.
-          INSERT OR IGNORE INTO agg_user (user_id, total_effective_time, count, wrong_count)
-            VALUES (NEW.user_id, NEW.effective_time, 1, (CASE WHEN NEW.correct = 0 THEN 1 ELSE 0 END));
-      END;
-    """)    
+    # Read and execute the SQL schema file
+    with open('create_database.sql', 'r') as sql_file:
+        sql_script = sql_file.read()
+        cur.executescript(sql_script)
+    
     conn.commit()
     conn.close()
 
 init_db()
 
 @app.route("/")
-def index():
+def index() -> str:
+    """
+    Serve different templates based on the host header.
+    
+    Returns:
+        str: Rendered HTML template for pizza party or times tables
+    """
     # Check the host header to determine which template to serve
     host = request.headers.get('Host', '').lower()
     
@@ -136,7 +55,13 @@ def index():
         return render_template('index.html')
 
 @app.route("/submit", methods=["POST"])
-def submit():
+def submit() -> Dict[str, Any]:
+    """
+    Submit times table responses and return aggregated statistics.
+    
+    Returns:
+        Dict[str, Any]: JSON response with heatmap data and statistics
+    """
     data = request.get_json()
     responses = data.get("responses", [])
     user_id = data.get("user_id")
@@ -213,7 +138,13 @@ def submit():
     })
 
 @app.route("/pizza/join", methods=["POST"])
-def join_pizza_party():
+def join_pizza_party() -> Dict[str, Any]:
+    """
+    Join a pizza party with attendee preferences.
+    
+    Returns:
+        Dict[str, Any]: JSON response with success status and optional override info
+    """
     data = request.get_json()
     party_id = data.get("partyNumber")
     name = data.get("name")
@@ -286,14 +217,29 @@ def join_pizza_party():
         return jsonify({"error": str(e)}), 500
 
 @app.route("/pizza/ingredients", methods=["GET"])
-def get_pizza_ingredients():
-    """Get list of available pizza ingredients"""
+def get_pizza_ingredients() -> Dict[str, List[str]]:
+    """
+    Get list of available pizza ingredients.
+    
+    Returns:
+        Dict[str, List[str]]: JSON response with list of ingredient names
+    """
     return jsonify({
         "ingredients": PIZZA_INGREDIENTS
     })
 
 @app.route("/pizza/summary/<party_id>", methods=["GET"])
-def get_pizza_party_summary(party_id):
+def get_pizza_party_summary(party_id: str) -> Dict[str, Any]:
+    """
+    Get pizza party summary with attendee data and calculated pizza orders.
+    
+    Args:
+        party_id (str): 4-character alphanumeric party identifier
+        
+    Returns:
+        Dict[str, Any]: JSON response with party summary, attendee list, 
+                       total slices, top ingredients, and pizza orders
+    """
     # Validate party ID format
     if not party_id or len(party_id) != 4 or not party_id.isalnum():
         return jsonify({"error": "Invalid party ID format"}), 400
@@ -365,13 +311,42 @@ def get_pizza_party_summary(party_id):
         conn.close()
         return jsonify({"error": str(e)}), 500
 
-def calculate_pizza_orders(attendees, ingredient_scores):
-    """Calculate optimal pizza orders based on attendee preferences"""
+def calculate_pizza_orders(attendees: List[Tuple[int, str, int]], 
+                          ingredient_scores: Dict[str, List[int]]) -> List[Dict[str, Any]]:
+    """
+    Calculate optimal pizza orders based on attendee preferences.
+    
+    This function analyzes the collective preferences of all attendees and creates
+    a list of pizza orders that maximizes satisfaction while considering constraints
+    like total slices needed and ingredient popularity.
+    
+    Args:
+        attendees (List[Tuple[int, str, int]]): List of attendee data tuples
+            Each tuple contains: (attendee_id: int, name: str, slice_count: int)
+        ingredient_scores (Dict[str, List[int]]): Dictionary mapping ingredient names
+            to lists of preference scores for each attendee.
+            Preference values: 0 = will not eat, 1 = indifferent, 2 = want to eat
+            Example: {"pepperoni": [2, 1, 0, 2], "mushrooms": [1, 2, 1, 1]}
+    
+    Returns:
+        List[Dict[str, Any]]: List of pizza order dictionaries, each containing:
+            - "type" (str): Name of the pizza (e.g., "Pepperoni Pizza", "Plain Cheese")
+            - "ingredients" (List[str]): List of ingredient names on this pizza
+            - "slices" (int): Number of slices (always 10)
+            - "description" (str): Human-readable description of the pizza
+    
+    Algorithm:
+        1. Calculate total slices needed and required pizzas (10 slices per pizza)
+        2. Score each ingredient based on (want_count - avoid_count) / total_people
+        3. Always include a plain cheese pizza for everyone
+        4. Create specialty pizzas for highly preferred ingredients (score > 0.2)
+        5. If space allows, create combination pizzas with top ingredients
+    """
     total_slices = sum(attendee[2] for attendee in attendees)
     total_pizzas_needed = (total_slices + 9) // 10  # Round up
     
     # Calculate ingredient popularity scores
-    ingredient_popularity = {}
+    ingredient_popularity: Dict[str, float] = {}
     for ingredient, preferences in ingredient_scores.items():
         want_count = sum(1 for pref in preferences if pref == 2)
         avoid_count = sum(1 for pref in preferences if pref == 0)
@@ -382,10 +357,10 @@ def calculate_pizza_orders(attendees, ingredient_scores):
         ingredient_popularity[ingredient] = score
     
     # Sort ingredients by popularity
-    sorted_ingredients = sorted(ingredient_popularity.items(), key=lambda x: x[1], reverse=True)
+    sorted_ingredients: List[Tuple[str, float]] = sorted(ingredient_popularity.items(), key=lambda x: x[1], reverse=True)
     
     # Create pizza orders
-    pizza_orders = []
+    pizza_orders: List[Dict[str, Any]] = []
     
     # Plain cheese pizza (always needed)
     pizza_orders.append({
@@ -396,8 +371,8 @@ def calculate_pizza_orders(attendees, ingredient_scores):
     })
     
     # Create specialty pizzas based on preferences
-    specialty_pizzas_created = 0
-    max_specialty_pizzas = max(0, total_pizzas_needed - 1)  # Leave room for plain pizza
+    specialty_pizzas_created: int = 0
+    max_specialty_pizzas: int = max(0, total_pizzas_needed - 1)  # Leave room for plain pizza
     
     for ingredient, score in sorted_ingredients:
         if specialty_pizzas_created >= max_specialty_pizzas:
@@ -413,10 +388,10 @@ def calculate_pizza_orders(attendees, ingredient_scores):
             specialty_pizzas_created += 1
     
     # If we have room for more pizzas, create combination pizzas
-    remaining_pizzas = max_specialty_pizzas - specialty_pizzas_created
+    remaining_pizzas: int = max_specialty_pizzas - specialty_pizzas_created
     if remaining_pizzas > 0:
         # Create combination pizzas with top ingredients
-        top_ingredients = [ing for ing, score in sorted_ingredients[:4] if score > 0.1]
+        top_ingredients: List[str] = [ing for ing, score in sorted_ingredients[:4] if score > 0.1]
         if len(top_ingredients) >= 2:
             pizza_orders.append({
                 "type": "Supreme Pizza",
