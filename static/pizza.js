@@ -36,10 +36,18 @@ document.addEventListener('DOMContentLoaded', function() {
     // Button event listeners
     plannerButton.addEventListener('click', () => {
         showScreen(plannerContainer);
+        // Auto-focus the Pizza Party ID input field
+        setTimeout(() => {
+            document.getElementById('plannerPartyNumber').focus();
+        }, 100);
     });
 
     eaterButton.addEventListener('click', () => {
         showScreen(eaterContainer);
+        // Auto-focus the first input field for better UX
+        setTimeout(() => {
+            document.getElementById('partyNumber').focus();
+        }, 100);
     });
 
     backToHome.addEventListener('click', () => {
@@ -72,8 +80,8 @@ document.addEventListener('DOMContentLoaded', function() {
         }
         
         const data = {
-            partyNumber: partyId,
-            name: formData.get('eaterName'),
+            partyNumber: partyId.toUpperCase(),
+            name: formData.get('eaterName').toUpperCase(),
             sliceCount: parseInt(formData.get('sliceCount')),
             favoriteTopping: formData.get('favoriteTopping')
         };
@@ -122,7 +130,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }
 
         try {
-            const response = await fetch(`/pizza/summary/${partyId}`);
+            const response = await fetch(`/pizza/summary/${partyId.toUpperCase()}`);
             const result = await response.json();
             
             if (response.ok) {
