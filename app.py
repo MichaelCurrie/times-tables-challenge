@@ -5,6 +5,16 @@ import os
 app = Flask(__name__)
 DATABASE = "data.db"
 
+# Attendee overrides for special cases
+ATTENDEE_OVERRIDES = [
+    {
+        "names": ["Stephen", "Andrew", "Alex", "Vanessa", "Brynn", "Dominic", "Benjamin", "Bridget", "Holly"],
+        "trigger_name": "Evelyn",
+        "override_image": "/static/auntielynn.jpg",
+        "override_message": "Auntie Lynn says hi! 🍕"
+    }
+]
+
 def init_db():
     conn = sqlite3.connect(DATABASE)
     cur = conn.cursor()
@@ -204,6 +214,33 @@ def join_pizza_party():
     cur = conn.cursor()
     
     try:
+        # Check for attendee overrides
+        override_info = None
+        for override in ATTENDEE_OVERRIDES:
+            if name in override["names"]:
+                # Check if Evelyn is already in this party
+                cur.execute("""
+                    SELECT name FROM pizza_attendees 
+                    WHERE party_number = ? AND name = ?
+                """, (party_id.upper(), override["trigger_name"]))
+                
+                if cur.fetchone():
+                    override_info = override
+                    break
+        
+        # If override is needed, use Evelyn's preferences
+        if override_info:
+            # Get Evelyn's preferences from the database
+            cur.execute("""
+                SELECT slice_count, favorite_topping FROM pizza_attendees 
+                WHERE party_number = ? AND name = ?
+            """, (party_id.upper(), override_info["trigger_name"]))
+            
+            evelyn_data = cur.fetchone()
+            if evelyn_data:
+                slice_count = evelyn_data[0]
+                favorite_topping = evelyn_data[1]
+        
         cur.execute("""
             INSERT INTO pizza_attendees (party_number, name, slice_count, favorite_topping)
             VALUES (?, ?, ?, ?)
@@ -212,7 +249,16 @@ def join_pizza_party():
         conn.commit()
         conn.close()
         
-        return jsonify({"success": True, "message": "Successfully joined the pizza party!"})
+        response_data = {"success": True, "message": "Successfully joined the pizza party!"}
+        
+        # Add override info if applicable
+        if override_info:
+            response_data["override"] = {
+                "image": override_info["override_image"],
+                "message": override_info["override_message"]
+            }
+        
+        return jsonify(response_data)
     except Exception as e:
         conn.close()
         return jsonify({"error": str(e)}), 500

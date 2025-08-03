@@ -399,10 +399,10 @@ body.pizza-theme .container {
 }
 
 .pizza-title {
-  font-size: 2.5em;
+  font-size: 3.5em;
   font-weight: bold;
   color: #fff;
-  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+  text-shadow: 3px 3px 6px rgba(0, 0, 0, 0.6);
   margin: 0;
   text-align: center;
   background: rgba(255, 255, 255, 0.02);
@@ -411,6 +411,25 @@ body.pizza-theme .container {
   border-radius: 15px;
   border: 1px solid rgba(255, 255, 255, 0.05);
   box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+  font-family: 'Comic Sans MS', 'Chalkboard SE', 'Marker Felt', cursive;
+  letter-spacing: 2px;
+}
+
+.pizza-subtitle {
+  font-size: 1.8em;
+  font-weight: 600;
+  color: #fff;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+  margin: 10px 0 0 0;
+  text-align: center;
+  background: rgba(255, 255, 255, 0.02);
+  backdrop-filter: blur(2px);
+  padding: 15px 25px;
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+  font-family: 'Comic Sans MS', 'Chalkboard SE', 'Marker Felt', cursive;
+  letter-spacing: 1px;
 }
 
 /* Animated background pizza image */
@@ -667,7 +686,8 @@ body.pizza-theme footer a:hover {
 /* Container visibility */
 #eaterContainer,
 #plannerContainer,
-#plannerResultsContainer {
+#plannerResultsContainer,
+#overrideContainer {
   display: none;
   flex-direction: column;
   justify-content: center;
@@ -740,4 +760,28 @@ body.pizza-theme footer a:hover {
   padding: 2px 8px;
   border-radius: 10px;
   font-size: 0.8em;
+}
+
+/* Override screen styles */
+.override-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+  max-width: 500px;
+  margin: 0 auto;
+  padding: 20px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 15px;
+  border: 2px solid rgba(255, 255, 255, 0.2);
+  backdrop-filter: blur(10px);
+  position: relative;
+  z-index: 3;
+}
+
+.override-image {
+  max-width: 100%;
+  height: auto;
+  border-radius: 10px;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
 }

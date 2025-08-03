@@ -15,7 +15,8 @@
             <!-- Start Screen -->
             <div id="startScreen">
                 <div class="pizza-header">
-                    <h1 class="pizza-title">Slice to Meet You Pizza Party Planner</h1>
+                    <h1 class="pizza-title">Slice to Meet You</h1>
+                    <h2 class="pizza-subtitle">Pizza Party Planner</h2>
                 </div>
                 <div class="pizza-buttons">
                     <button class="pizza-button planner-button" id="plannerButton" aria-label="I'm a Planner" role="button">
@@ -90,28 +91,39 @@
                 <button id="backToHomePlanner" class="pizza-button back-button">← Back to Home</button>
             </div>
 
-            <!-- PLANNER Results Screen -->
-            <div id="plannerResultsContainer">
-                <div class="pizza-header">
-                    <h2>🍕 Pizza Party Summary</h2>
-                    <p>Party #<span id="partyNumberDisplay"></span></p>
-                </div>
-                <div class="party-summary">
-                    <div class="summary-card">
-                        <h3>👥 Attendees</h3>
-                        <div id="attendeesList"></div>
-                    </div>
-                    <div class="summary-card">
-                        <h3>🍕 Total Slices</h3>
-                        <div id="totalSlices"></div>
-                    </div>
-                    <div class="summary-card">
-                        <h3>🏆 Top 3 Favorite Toppings</h3>
-                        <div id="topToppings"></div>
-                    </div>
-                </div>
-                <button id="backToPlanner" class="pizza-button back-button">← Back to Planner</button>
-            </div>
+                         <!-- PLANNER Results Screen -->
+             <div id="plannerResultsContainer">
+                 <div class="pizza-header">
+                     <h2>🍕 Pizza Party Summary</h2>
+                     <p>Party #<span id="partyNumberDisplay"></span></p>
+                 </div>
+                 <div class="party-summary">
+                     <div class="summary-card">
+                         <h3>👥 Attendees</h3>
+                         <div id="attendeesList"></div>
+                     </div>
+                     <div class="summary-card">
+                         <h3>🍕 Total Slices</h3>
+                         <div id="totalSlices"></div>
+                     </div>
+                     <div class="summary-card">
+                         <h3>🏆 Top 3 Favorite Toppings</h3>
+                         <div id="topToppings"></div>
+                     </div>
+                 </div>
+                 <button id="backToPlanner" class="pizza-button back-button">← Back to Planner</button>
+             </div>
+
+             <!-- Override Screen -->
+             <div id="overrideContainer">
+                 <div class="pizza-header">
+                     <h2 id="overrideMessage">Auntie Lynn says hi! 🍕</h2>
+                 </div>
+                 <div class="override-content">
+                     <img id="overrideImage" src="" alt="Special Message" class="override-image">
+                 </div>
+                 <button id="backToHomeFromOverride" class="pizza-button back-button">← Back to Home</button>
+             </div>
             <footer id="siteFooter">
                 <a href="https://twitter.com/michaelbcurrie" target="_blank">
                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20" fill="currentColor">

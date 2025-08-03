@@ -6,6 +6,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const eaterContainer = document.getElementById('eaterContainer');
     const plannerContainer = document.getElementById('plannerContainer');
     const plannerResultsContainer = document.getElementById('plannerResultsContainer');
+    const overrideContainer = document.getElementById('overrideContainer');
 
     // Get all the buttons
     const plannerButton = document.getElementById('plannerButton');
@@ -13,6 +14,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const backToHome = document.getElementById('backToHome');
     const backToHomePlanner = document.getElementById('backToHomePlanner');
     const backToPlanner = document.getElementById('backToPlanner');
+    const backToHomeFromOverride = document.getElementById('backToHomeFromOverride');
 
     // Get forms
     const eaterForm = document.getElementById('eaterForm');
@@ -25,6 +27,7 @@ document.addEventListener('DOMContentLoaded', function() {
         eaterContainer.style.display = 'none';
         plannerContainer.style.display = 'none';
         plannerResultsContainer.style.display = 'none';
+        overrideContainer.style.display = 'none';
 
         // Show the requested screen
         screen.style.display = 'flex';
@@ -49,6 +52,10 @@ document.addEventListener('DOMContentLoaded', function() {
 
     backToPlanner.addEventListener('click', () => {
         showScreen(plannerContainer);
+    });
+
+    backToHomeFromOverride.addEventListener('click', () => {
+        showScreen(startScreen);
     });
 
     // Eater form submission
@@ -83,9 +90,16 @@ document.addEventListener('DOMContentLoaded', function() {
             const result = await response.json();
             
             if (result.success) {
-                alert('Successfully joined the pizza party! 🍕');
-                eaterForm.reset();
-                showScreen(startScreen);
+                if (result.override) {
+                    // Show override screen
+                    document.getElementById('overrideMessage').textContent = result.override.message;
+                    document.getElementById('overrideImage').src = result.override.image;
+                    showScreen(overrideContainer);
+                } else {
+                    alert('Successfully joined the pizza party! 🍕');
+                    eaterForm.reset();
+                    showScreen(startScreen);
+                }
             } else {
                 alert('Error: ' + result.error);
             }
