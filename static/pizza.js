@@ -358,6 +358,68 @@ document.addEventListener("DOMContentLoaded", function () {
   setupPizzaSliceSpinners();
   setupCustomSliceSpinner();
   setupPizzaOptions();
+  setupPreferenceButtons();
+
+  // Setup preference buttons functionality
+  function setupPreferenceButtons() {
+    const pizzaRouletteBtn = document.getElementById('pizzaRouletteBtn');
+    const markAllAvoidBtn = document.getElementById('markAllAvoidBtn');
+    const resetPreferencesBtn = document.getElementById('resetPreferencesBtn');
+
+    // Get all ingredients list
+    const allIngredients = [
+      // MEAT
+      "anchovies", "bacon", "beef", "chicken", "ham", "pepperoni", "sausage",
+      // VEGETABLES  
+      "artichokes", "bell-peppers", "mushrooms", "olives", "onions", "pineapple", "spinach", "tomatoes",
+      // HERBS AND CHEESES
+      "basil", "extra-cheese", "garlic", "vegan-cheese"
+    ];
+
+    // Pizza Roulette - randomize all preferences
+    if (pizzaRouletteBtn) {
+      pizzaRouletteBtn.addEventListener('click', () => {
+        allIngredients.forEach(ingredient => {
+          // Randomly select 0, 1, or 2 (will not eat, indifferent, want to eat)
+          const randomPreference = Math.floor(Math.random() * 3);
+          const radio = document.querySelector(`input[name="pref_${ingredient}"][value="${randomPreference}"]`);
+          if (radio) {
+            radio.checked = true;
+          }
+        });
+        
+        // Add a fun animation effect
+        pizzaRouletteBtn.style.transform = 'rotate(360deg)';
+        setTimeout(() => {
+          pizzaRouletteBtn.style.transform = '';
+        }, 600);
+      });
+    }
+
+    // Mark All Will Not Eat
+    if (markAllAvoidBtn) {
+      markAllAvoidBtn.addEventListener('click', () => {
+        allIngredients.forEach(ingredient => {
+          const radio = document.querySelector(`input[name="pref_${ingredient}"][value="0"]`);
+          if (radio) {
+            radio.checked = true;
+          }
+        });
+      });
+    }
+
+    // Reset - set all to indifferent
+    if (resetPreferencesBtn) {
+      resetPreferencesBtn.addEventListener('click', () => {
+        allIngredients.forEach(ingredient => {
+          const radio = document.querySelector(`input[name="pref_${ingredient}"][value="1"]`);
+          if (radio) {
+            radio.checked = true;
+          }
+        });
+      });
+    }
+  }
 
   // Populate ingredient checkboxes for creator screen
   function populateIngredientCheckboxes() {
