@@ -911,3 +911,37 @@ body.pizza-theme footer a:hover {
 .ingredient-table label:hover {
   background: rgba(255, 255, 255, 0.1);
 }
+
+/* Preference collection styles */
+.preference-collection {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 10px;
+  padding: 15px;
+  margin: 10px 0;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.collection-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.collection-slices {
+  font-weight: bold;
+  color: #ffd700;
+  font-size: 1.1em;
+}
+
+.collection-description {
+  color: #fff;
+  font-weight: 500;
+  flex: 1;
+  margin-left: 15px;
+}
+
+.collection-attendees {
+  color: rgba(255, 255, 255, 0.7);
+  font-style: italic;
+}

@@ -242,7 +242,7 @@ def join_pizza_party() -> Dict[str, Any]:
         for override in ATTENDEE_OVERRIDES:
             if name in override["names"]:
                 print(f"DEBUG: Found override for {name}")  # Debug log
-                # Check if Evelyn is already in this party
+                # Check if the Boss of this attendee e.g. Evelyn is already in this party
                 cur.execute(
                     """
                     SELECT id FROM pizza_attendees 
@@ -251,23 +251,25 @@ def join_pizza_party() -> Dict[str, Any]:
                     (party_id.upper(), override["trigger_name"]),
                 )
 
-                evelyn_attendee = cur.fetchone()
-                print(f"DEBUG: Evelyn attendee found: {evelyn_attendee}")  # Debug log
-                if evelyn_attendee:
+                boss = cur.fetchone()
+                print(f"DEBUG: Evelyn attendee found: {boss}")  # Debug log
+                if boss:
                     override_info = override
-                    # Get Evelyn's preferences
+                    # Get the Boss's preferences
                     cur.execute(
                         """
                         SELECT ingredient, preference FROM pizza_preferences 
                         WHERE attendee_id = ?
                     """,
-                        (evelyn_attendee[0],),
+                        (boss[0],),
                     )
                     evelyn_preferences = dict(cur.fetchall())
-                    print(f"DEBUG: Evelyn preferences: {evelyn_preferences}")  # Debug log
-                    # Override the current preferences with Evelyn's preferences
-                    preferences = evelyn_preferences
-                    print(f"DEBUG: Override triggered!")  # Debug log
+                    print(f"DEBUG: Evelyn preferences: {bosspreferences}")  # Debug log
+                    # Override the current preferences with the Boss's preferences
+                    preferences = boss_preferences
+                    print(
+                        f"DEBUG: Preference override triggered from {name} -> {override['trigger_name']}!"
+                    )  # Debug log
                     break
 
         # Insert attendee
@@ -379,7 +381,69 @@ def get_pizza_party_summary(party_id: str) -> Dict[str, Any]:
 
         preferences_data = cur.fetchall()
 
-        # Organize preferences by ingredient
+        # Organize preferences by attendee
+        attendee_preferences = {}
+        for attendee_id, ingredient, preference in preferences_data:
+            if attendee_id not in attendee_preferences:
+                attendee_preferences[attendee_id] = {}
+            attendee_preferences[attendee_id][ingredient] = preference
+
+        # Create preference collections (group attendees with same preferences)
+        preference_collections = {}
+        for attendee_id, name, slice_count in attendees:
+            if attendee_id in attendee_preferences:
+                # Create a tuple of preferences as the key
+                pref_tuple = tuple(sorted(attendee_preferences[attendee_id].items()))
+
+                if pref_tuple not in preference_collections:
+                    preference_collections[pref_tuple] = {
+                        "total_slices": 0,
+                        "attendees": [],
+                        "preferences": dict(pref_tuple),
+                    }
+
+                preference_collections[pref_tuple]["total_slices"] += slice_count
+                preference_collections[pref_tuple]["attendees"].append(name)
+
+        # Sort collections by total slices descending
+        sorted_collections = sorted(
+            preference_collections.items(),
+            key=lambda x: x[1]["total_slices"],
+            reverse=True,
+        )
+
+        # Format preference collections for display
+        formatted_collections = []
+        for pref_tuple, collection_data in sorted_collections:
+            wants = []
+            cant_haves = []
+
+            for ingredient, preference in collection_data["preferences"].items():
+                if preference == 2:  # Want
+                    wants.append(ingredient)
+                elif preference == 0:  # Can't have
+                    cant_haves.append(ingredient)
+
+            # Create description
+            description_parts = []
+            if wants:
+                description_parts.append(f"WANT {', '.join(wants)}")
+            if cant_haves:
+                description_parts.append(f"CAN'T HAVE {', '.join(cant_haves)}")
+            if not wants and not cant_haves:
+                description_parts.append("indifferent to all")
+
+            description = ", ".join(description_parts)
+
+            formatted_collections.append(
+                {
+                    "slices": collection_data["total_slices"],
+                    "description": description,
+                    "attendees": collection_data["attendees"],
+                }
+            )
+
+        # Organize preferences by ingredient (for pizza calculation)
         ingredient_scores = {}
         for attendee_id, ingredient, preference in preferences_data:
             if ingredient not in ingredient_scores:
@@ -411,6 +475,7 @@ def get_pizza_party_summary(party_id: str) -> Dict[str, Any]:
                 "total_slices": total_slices,
                 "top_ingredients": top_3_ingredients,
                 "pizza_orders": pizza_orders,
+                "preference_collections": formatted_collections,
             }
         )
     except Exception as e:

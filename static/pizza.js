@@ -210,23 +210,23 @@ document.addEventListener("DOMContentLoaded", function () {
 
       const result = await response.json();
 
-             if (result.success) {
-         console.log("Join result:", result); // Debug log
-         if (result.override) {
-           console.log("Override triggered:", result.override); // Debug log
-           // Show override screen
-           document.getElementById("overrideMessage").textContent =
-             result.override.message;
-           document.getElementById("overrideImage").src = result.override.image;
-           showScreen(overrideContainer);
-         } else {
-           alert("Successfully joined the pizza party! 🍕");
-           eaterForm.reset();
-           showScreen(startScreen);
-         }
-       } else {
-         alert("Error: " + result.error);
-       }
+      if (result.success) {
+        console.log("Join result:", result); // Debug log
+        if (result.override) {
+          console.log("Override triggered:", result.override); // Debug log
+          // Show override screen
+          document.getElementById("overrideMessage").textContent =
+            result.override.message;
+          document.getElementById("overrideImage").src = result.override.image;
+          showScreen(overrideContainer);
+        } else {
+          alert("Successfully joined the pizza party! 🍕");
+          eaterForm.reset();
+          showScreen(startScreen);
+        }
+      } else {
+        alert("Error: " + result.error);
+      }
     } catch (error) {
       alert("Error joining party: " + error.message);
     }
@@ -289,6 +289,30 @@ document.addEventListener("DOMContentLoaded", function () {
         .join("");
     } else {
       topToppings.innerHTML = "<p>No ingredient preferences recorded yet.</p>";
+    }
+
+    // Display preference collections if available
+    const preferenceCollections = document.getElementById(
+      "preferenceCollections",
+    );
+    if (data.preference_collections && data.preference_collections.length > 0) {
+      preferenceCollections.innerHTML = data.preference_collections
+        .map(
+          (collection) =>
+            `<div class="preference-collection">
+                     <div class="collection-header">
+                         <span class="collection-slices">${collection.slices} slices</span>
+                         <span class="collection-description">${collection.description}</span>
+                     </div>
+                     <div class="collection-attendees">
+                         <small>(${collection.attendees.join(", ")})</small>
+                     </div>
+                 </div>`,
+        )
+        .join("");
+    } else {
+      preferenceCollections.innerHTML =
+        "<p>No preference collections available.</p>";
     }
 
     // Display pizza orders if available
