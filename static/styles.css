@@ -868,6 +868,7 @@ body.pizza-theme footer a:hover {
 .ingredient-table input[type="radio"] {
   margin: 0;
   cursor: pointer;
+  vertical-align: middle;
 }
 
 .ingredient-table input[type="radio"]:checked + label {
@@ -880,6 +881,9 @@ body.pizza-theme footer a:hover {
   padding: 2px 4px;
   border-radius: 4px;
   transition: all 0.2s ease;
+  vertical-align: middle;
+  display: inline-block;
+  margin-left: 4px;
 }
 
 .ingredient-table label:hover {

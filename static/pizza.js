@@ -38,12 +38,37 @@ document.addEventListener('DOMContentLoaded', function() {
             "spinach", "artichokes", "extra-cheese", "vegan-cheese", "basil", "garlic"
         ];
         
+        // Ingredient icons mapping
+        const ingredientIcons = {
+            "pepperoni": "🍕",
+            "mushrooms": "🍄",
+            "sausage": "🌭",
+            "bacon": "🥓",
+            "ham": "🥩",
+            "chicken": "🍗",
+            "beef": "🥩",
+            "anchovies": "🐟",
+            "olives": "🫒",
+            "bell-peppers": "🫑",
+            "onions": "🧅",
+            "tomatoes": "🍅",
+            "pineapple": "🍍",
+            "spinach": "🥬",
+            "artichokes": "🥬",
+            "extra-cheese": "🧀",
+            "vegan-cheese": "🧀",
+            "basil": "🌿",
+            "garlic": "🧄"
+        };
+        
         defaultIngredients.forEach(ingredient => {
+            const icon = ingredientIcons[ingredient] || "🍕";
+            const displayName = ingredient.charAt(0).toUpperCase() + ingredient.slice(1).replace('-', ' ');
             const row = document.createElement('tr');
             row.innerHTML = `
-                <td>${ingredient.charAt(0).toUpperCase() + ingredient.slice(1).replace('-', ' ')}</td>
-                <td><input type="radio" name="pref_${ingredient}" value="0" id="pref_${ingredient}_0" checked><label for="pref_${ingredient}_0">❌</label></td>
-                <td><input type="radio" name="pref_${ingredient}" value="1" id="pref_${ingredient}_1"><label for="pref_${ingredient}_1">😐</label></td>
+                <td>${icon} ${displayName}</td>
+                <td><input type="radio" name="pref_${ingredient}" value="0" id="pref_${ingredient}_0"><label for="pref_${ingredient}_0">❌</label></td>
+                <td><input type="radio" name="pref_${ingredient}" value="1" id="pref_${ingredient}_1" checked><label for="pref_${ingredient}_1">😐</label></td>
                 <td><input type="radio" name="pref_${ingredient}" value="2" id="pref_${ingredient}_2"><label for="pref_${ingredient}_2">❤️</label></td>
             `;
             tableBody.appendChild(row);
