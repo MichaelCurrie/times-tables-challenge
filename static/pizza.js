@@ -19,6 +19,36 @@ document.addEventListener('DOMContentLoaded', function() {
     // Get forms
     const eaterForm = document.getElementById('eaterForm');
     const plannerForm = document.getElementById('plannerForm');
+    
+    // Initialize ingredient preferences table
+    let ingredientPreferences = {};
+    
+    // Populate ingredient table when eater screen is shown
+    function populateIngredientTable() {
+        const tableBody = document.getElementById('ingredientTableBody');
+        if (!tableBody) return;
+        
+        // Clear existing content
+        tableBody.innerHTML = '';
+        
+        // Default ingredients (will be replaced by API call)
+        const defaultIngredients = [
+            "pepperoni", "mushrooms", "sausage", "bacon", "ham", "chicken", "beef", 
+            "anchovies", "olives", "bell-peppers", "onions", "tomatoes", "pineapple", 
+            "spinach", "artichokes", "extra-cheese", "vegan-cheese", "basil", "garlic"
+        ];
+        
+        defaultIngredients.forEach(ingredient => {
+            const row = document.createElement('tr');
+            row.innerHTML = `
+                <td>${ingredient.charAt(0).toUpperCase() + ingredient.slice(1).replace('-', ' ')}</td>
+                <td><input type="radio" name="pref_${ingredient}" value="0" id="pref_${ingredient}_0" checked><label for="pref_${ingredient}_0">❌</label></td>
+                <td><input type="radio" name="pref_${ingredient}" value="1" id="pref_${ingredient}_1"><label for="pref_${ingredient}_1">😐</label></td>
+                <td><input type="radio" name="pref_${ingredient}" value="2" id="pref_${ingredient}_2"><label for="pref_${ingredient}_2">❤️</label></td>
+            `;
+            tableBody.appendChild(row);
+        });
+    }
 
     // Navigation functions
     function showScreen(screen) {
@@ -44,6 +74,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     eaterButton.addEventListener('click', () => {
         showScreen(eaterContainer);
+        populateIngredientTable();
         // Auto-focus the first input field for better UX
         setTimeout(() => {
             document.getElementById('partyNumber').focus();
@@ -79,11 +110,28 @@ document.addEventListener('DOMContentLoaded', function() {
             return;
         }
         
+        // Collect ingredient preferences
+        const preferences = {};
+        const defaultIngredients = [
+            "pepperoni", "mushrooms", "sausage", "bacon", "ham", "chicken", "beef", 
+            "anchovies", "olives", "bell-peppers", "onions", "tomatoes", "pineapple", 
+            "spinach", "artichokes", "extra-cheese", "vegan-cheese", "basil", "garlic"
+        ];
+        
+        defaultIngredients.forEach(ingredient => {
+            const selectedRadio = document.querySelector(`input[name="pref_${ingredient}"]:checked`);
+            if (selectedRadio) {
+                preferences[ingredient] = parseInt(selectedRadio.value);
+            } else {
+                preferences[ingredient] = 1; // Default to indifferent
+            }
+        });
+        
         const data = {
             partyNumber: partyId.toUpperCase(),
             name: formData.get('eaterName').toUpperCase(),
             sliceCount: parseInt(formData.get('sliceCount')),
-            favoriteTopping: formData.get('favoriteTopping')
+            preferences: preferences
         };
 
         try {
