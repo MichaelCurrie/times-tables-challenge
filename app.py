@@ -88,20 +88,20 @@ def index() -> str:
 def pizza_party_with_id(party_id: str) -> str:
     """
     Serve pizza party template with pre-filled party ID.
-    
+
     Args:
         party_id (str): 4-character alphanumeric party identifier
-        
+
     Returns:
         str: Rendered HTML template for pizza party with party ID
     """
     # Validate party ID format
     if not party_id or len(party_id) != 4 or not party_id.isalnum():
         return render_template("pizza.html")
-    
+
     # Check the host header to determine which template to serve
     host = request.headers.get("Host", "").lower()
-    
+
     if "slicetomeetyou.com" in host:
         return render_template("pizza.html", party_id=party_id.upper())
     else:
@@ -224,17 +224,26 @@ def join_pizza_party() -> Dict[str, Any]:
     name = data.get("name")
     custom_pizza = data.get("custom_pizza", {})
     existing_pizza_slices = data.get("existingPizza_slicesWanted", {})
-    
+
     # Calculate total slice count from custom pizza and existing pizza selections
     custom_slices = custom_pizza.get("sliceCount", 0)
-    existing_slices = sum(existing_pizza_slices.values()) if existing_pizza_slices else 0
+    existing_slices = (
+        sum(existing_pizza_slices.values()) if existing_pizza_slices else 0
+    )
     total_slice_count = custom_slices + existing_slices
-    
+
     # Get preferences from custom pizza
     preferences = custom_pizza.get("preferences", {})
 
     if not all([party_id, name]) or total_slice_count <= 0:
-        return jsonify({"error": "Party ID, name, and at least one slice selection are required"}), 400
+        return (
+            jsonify(
+                {
+                    "error": "Party ID, name, and at least one slice selection are required"
+                }
+            ),
+            400,
+        )
 
     # Validate party ID format (4 characters, letters and numbers)
     if not party_id or len(party_id) != 4 or not party_id.isalnum():
@@ -372,26 +381,21 @@ def get_available_pizzas() -> Dict[str, Any]:
             "id": "pepperoni",
             "name": "Pepperoni",
             "ingredients": ["pepperoni"],
-            "type": "hardcoded"
+            "type": "hardcoded",
         },
-        {
-            "id": "cheese",
-            "name": "Cheese",
-            "ingredients": [],
-            "type": "hardcoded"
-        },
+        {"id": "cheese", "name": "Cheese", "ingredients": [], "type": "hardcoded"},
         {
             "id": "pineapple-ham",
             "name": "Pineapple and Ham",
             "ingredients": ["pineapple", "ham"],
-            "type": "hardcoded"
+            "type": "hardcoded",
         },
         {
             "id": "spinach-tomato-pineapple",
             "name": "Spinach, Tomatoes and Pineapple",
             "ingredients": ["spinach", "tomatoes", "pineapple"],
-            "type": "hardcoded"
-        }
+            "type": "hardcoded",
+        },
     ]
 
     # Get custom pizzas from database
@@ -400,33 +404,39 @@ def get_available_pizzas() -> Dict[str, Any]:
 
     try:
         # Get all named pizzas with their ingredients
-        cur.execute("""
+        cur.execute(
+            """
             SELECT np.id, np.name, GROUP_CONCAT(npi.ingredient, ',') as ingredients
             FROM named_pizzas np
             LEFT JOIN named_pizzas_ingredients npi ON np.id = npi.pizza_id
             GROUP BY np.id, np.name
             ORDER BY np.timestamp DESC
-        """)
-        
+        """
+        )
+
         custom_pizzas_data = cur.fetchall()
         custom_pizzas = []
-        
+
         for pizza_id, name, ingredients_str in custom_pizzas_data:
-            ingredients = ingredients_str.split(',') if ingredients_str else []
-            custom_pizzas.append({
-                "id": f"custom_{pizza_id}",
-                "name": name,
-                "ingredients": ingredients,
-                "type": "custom"
-            })
+            ingredients = ingredients_str.split(",") if ingredients_str else []
+            custom_pizzas.append(
+                {
+                    "id": f"custom_{pizza_id}",
+                    "name": name,
+                    "ingredients": ingredients,
+                    "type": "custom",
+                }
+            )
 
         conn.close()
 
-        return jsonify({
-            "hardcoded_pizzas": hardcoded_pizzas,
-            "custom_pizzas": custom_pizzas,
-            "all_pizzas": hardcoded_pizzas + custom_pizzas
-        })
+        return jsonify(
+            {
+                "hardcoded_pizzas": hardcoded_pizzas,
+                "custom_pizzas": custom_pizzas,
+                "all_pizzas": hardcoded_pizzas + custom_pizzas,
+            }
+        )
 
     except Exception as e:
         conn.close()
@@ -467,30 +477,32 @@ def create_pizza() -> Dict[str, Any]:
         # Check if pizza name already exists
         cur.execute("SELECT id FROM named_pizzas WHERE name = ?", (pizza_name,))
         if cur.fetchone():
-            return jsonify({"error": f"Pizza with name '{pizza_name}' already exists"}), 400
+            return (
+                jsonify({"error": f"Pizza with name '{pizza_name}' already exists"}),
+                400,
+            )
 
         # Insert the named pizza
-        cur.execute(
-            "INSERT INTO named_pizzas (name) VALUES (?)",
-            (pizza_name,)
-        )
+        cur.execute("INSERT INTO named_pizzas (name) VALUES (?)", (pizza_name,))
         pizza_id = cur.lastrowid
 
         # Insert the ingredients
         for ingredient in ingredients:
             cur.execute(
                 "INSERT INTO named_pizzas_ingredients (pizza_id, ingredient) VALUES (?, ?)",
-                (pizza_id, ingredient)
+                (pizza_id, ingredient),
             )
 
         conn.commit()
         conn.close()
 
-        return jsonify({
-            "success": True,
-            "message": f"Pizza '{pizza_name}' created successfully!",
-            "pizza_id": pizza_id
-        })
+        return jsonify(
+            {
+                "success": True,
+                "message": f"Pizza '{pizza_name}' created successfully!",
+                "pizza_id": pizza_id,
+            }
+        )
 
     except Exception as e:
         conn.close()
@@ -622,7 +634,9 @@ def get_pizza_party_summary(party_id: str) -> Dict[str, Any]:
             ingredient_scores[ingredient].append(preference)
 
         # Calculate optimal pizza orders with attendee assignments
-        pizza_orders = calculate_pizza_orders(attendees, ingredient_scores, preferences_data)
+        pizza_orders = calculate_pizza_orders(
+            attendees, ingredient_scores, preferences_data
+        )
 
         # Get top 3 most wanted ingredients
         top_ingredients = []
@@ -655,7 +669,9 @@ def get_pizza_party_summary(party_id: str) -> Dict[str, Any]:
 
 
 def calculate_pizza_orders(
-    attendees: List[Tuple[int, str, int]], ingredient_scores: Dict[str, List[int]], preferences_data: List[Tuple[int, str, int]]
+    attendees: List[Tuple[int, str, int]],
+    ingredient_scores: Dict[str, List[int]],
+    preferences_data: List[Tuple[int, str, int]],
 ) -> List[Dict[str, Any]]:
     """
     Calculate optimal pizza orders based on attendee preferences.
@@ -696,7 +712,7 @@ def calculate_pizza_orders(
     # Create attendee preferences lookup
     attendee_preferences = {}
     attendee_names = {attendee[0]: attendee[1] for attendee in attendees}
-    
+
     for attendee_id, ingredient, preference in preferences_data:
         if attendee_id not in attendee_preferences:
             attendee_preferences[attendee_id] = {}
@@ -708,20 +724,22 @@ def calculate_pizza_orders(
         for attendee_id, prefs in attendee_preferences.items():
             can_eat = True
             wants_it = False
-            
+
             for ingredient in pizza_ingredients:
                 if prefs.get(ingredient, 1) == 0:  # Will not eat
                     can_eat = False
                     break
                 elif prefs.get(ingredient, 1) == 2:  # Wants it
                     wants_it = True
-            
+
             # Include if they can eat it and either want it or are indifferent to all ingredients
             if can_eat and (wants_it or len(pizza_ingredients) == 0):
                 eaters.append(attendee_names[attendee_id])
-            elif can_eat and not pizza_ingredients:  # Plain cheese - everyone who can eat it
+            elif (
+                can_eat and not pizza_ingredients
+            ):  # Plain cheese - everyone who can eat it
                 eaters.append(attendee_names[attendee_id])
-        
+
         return eaters
 
     # Calculate ingredient popularity scores
