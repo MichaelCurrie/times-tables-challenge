@@ -1,134 +1,205 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-        <title>Slice to Meet You Pizza Picker</title>
-        <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
-    </head>
-    <body class="pizza-theme">
-        <!-- Animated background -->
-        <div class="pizza-background">
-            <img src="{{ url_for('static', filename='pizza_family.png') }}" alt="Pizza Background">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no"
+    />
+    <title>Slice to Meet You Pizza Picker</title>
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='styles.css') }}"
+    />
+  </head>
+  <body class="pizza-theme">
+    <!-- Animated background -->
+    <div class="pizza-background">
+      <img
+        src="{{ url_for('static', filename='pizza_family.png') }}"
+        alt="Pizza Background"
+      />
+    </div>
+    <div class="container">
+      <!-- Start Screen -->
+      <div id="startScreen">
+        <div class="pizza-header">
+          <h1 class="pizza-title">Slice to Meet You</h1>
+          <h2 class="pizza-subtitle">Pizza Party Planner</h2>
         </div>
-        <div class="container">
-            <!-- Start Screen -->
-            <div id="startScreen">
-                <div class="pizza-header">
-                    <h1 class="pizza-title">Slice to Meet You</h1>
-                    <h2 class="pizza-subtitle">Pizza Party Planner</h2>
-                </div>
-                <div class="pizza-buttons">
-                    <button class="pizza-button planner-button" id="plannerButton" aria-label="I'm a Planner" role="button">
-                        🍕 PLANNER
-                    </button>
-                    <button class="pizza-button eater-button" id="eaterButton" aria-label="I'm an Eater" role="button">
-                        🍽️ EATER
-                    </button>
-                </div>
-            </div>
-            <!-- EATER Form Screen -->
-            <div id="eaterContainer">
-                <div class="pizza-header">
-                    <h2>🍽️ I'm an Eater</h2>
-                    <p>Join the pizza party!</p>
-                </div>
-                <form id="eaterForm" class="pizza-form">
-                                         <div class="form-group">
-                         <label for="partyNumber">Pizza Party ID (4 characters):</label>
-                         <input type="text" id="partyNumber" name="partyNumber" maxlength="4" pattern="[A-Za-z0-9]{4}" placeholder="e.g., A1B2" required>
-                     </div>
-                    <div class="form-group">
-                        <label for="eaterName">Your Name:</label>
-                        <input type="text" id="eaterName" name="eaterName" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="sliceCount">How many slices do you want?</label>
-                        <input type="number" id="sliceCount" name="sliceCount" min="1" max="20" required>
-                    </div>
-                    <div class="form-group">
-                        <label>Pizza Ingredient Preferences:</label>
-                        <div class="ingredient-table">
-                            <table>
-                                <thead>
-                                    <tr>
-                                        <th>Ingredient</th>
-                                        <th>Will Not Eat</th>
-                                        <th>Indifferent</th>
-                                        <th>Want to Eat</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="ingredientTableBody">
-                                    <!-- Will be populated by JavaScript -->
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                    <button type="submit" class="pizza-button">Join the Party! 🍕</button>
-                </form>
-                <button id="backToHome" class="pizza-button back-button">← Back to Home</button>
-            </div>
-            <!-- PLANNER Form Screen -->
-            <div id="plannerContainer">
-                <div class="pizza-header">
-                    <h2>🍕 I'm a Planner</h2>
-                    <p>Check your pizza party status!</p>
-                </div>
-                <form id="plannerForm" class="pizza-form">
-                                         <div class="form-group">
-                         <label for="plannerPartyNumber">Pizza Party ID (4 characters):</label>
-                         <input type="text" id="plannerPartyNumber" name="plannerPartyNumber" maxlength="4" pattern="[A-Za-z0-9]{4}" placeholder="e.g., A1B2" required>
-                     </div>
-                    <button type="submit" class="pizza-button">Check Party Status! 🍕</button>
-                </form>
-                <button id="backToHomePlanner" class="pizza-button back-button">← Back to Home</button>
-            </div>
-
-                         <!-- PLANNER Results Screen -->
-             <div id="plannerResultsContainer">
-                 <div class="pizza-header">
-                     <h2>🍕 Pizza Party Summary</h2>
-                     <p>Party #<span id="partyNumberDisplay"></span></p>
-                 </div>
-                 <div class="party-image">
-                     <img src="{{ url_for('static', filename='pizzaparty.png') }}" alt="Pizza Party" class="summary-image">
-                 </div>
-                 <div class="party-summary">
-                     <div class="summary-card">
-                         <h3>👥 Attendees</h3>
-                         <div id="attendeesList"></div>
-                     </div>
-                     <div class="summary-card">
-                         <h3>🍕 Total Slices</h3>
-                         <div id="totalSlices"></div>
-                     </div>
-                     <div class="summary-card">
-                         <h3>🏆 Top 3 Most Wanted Ingredients</h3>
-                         <div id="topToppings"></div>
-                     </div>
-                 </div>
-                 <button id="backToPlanner" class="pizza-button back-button">← Back to Planner</button>
-             </div>
-
-             <!-- Override Screen -->
-             <div id="overrideContainer">
-                 <div class="pizza-header">
-                     <h2 id="overrideMessage">Auntie Lynn says hi! 🍕</h2>
-                 </div>
-                 <div class="override-content">
-                     <img id="overrideImage" src="" alt="Special Message" class="override-image">
-                 </div>
-                 <button id="backToHomeFromOverride" class="pizza-button back-button">← Back to Home</button>
-             </div>
-            <footer id="siteFooter">
-                <a href="https://twitter.com/michaelbcurrie" target="_blank">
-                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20" fill="currentColor">
-                        <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
-                    </svg>
-                    @michaelbcurrie
-                </a>
-            </footer>
+        <div class="pizza-buttons">
+          <button
+            class="pizza-button planner-button"
+            id="plannerButton"
+            aria-label="I'm a Planner"
+            role="button"
+          >
+            🍕 PLANNER
+          </button>
+          <button
+            class="pizza-button eater-button"
+            id="eaterButton"
+            aria-label="I'm an Eater"
+            role="button"
+          >
+            🍽️ EATER
+          </button>
         </div>
-        <script src="{{ url_for('static', filename='pizza.js') }}"></script>
-    </body>
-</html> 
+      </div>
+      <!-- EATER Form Screen -->
+      <div id="eaterContainer">
+        <div class="pizza-header">
+          <h2>🍽️ I'm an Eater</h2>
+          <p>Join the pizza party!</p>
+        </div>
+        <form id="eaterForm" class="pizza-form">
+          <div class="form-group">
+            <label for="partyNumber">Pizza Party ID (4 characters):</label>
+            <input
+              type="text"
+              id="partyNumber"
+              name="partyNumber"
+              maxlength="4"
+              pattern="[A-Za-z0-9]{4}"
+              placeholder="e.g., A1B2"
+              required
+            />
+          </div>
+          <div class="form-group">
+            <label for="eaterName">Your Name:</label>
+            <input type="text" id="eaterName" name="eaterName" required />
+          </div>
+          <div class="form-group">
+            <label for="sliceCount">How many slices do you want?</label>
+            <input
+              type="number"
+              id="sliceCount"
+              name="sliceCount"
+              min="1"
+              max="20"
+              required
+            />
+          </div>
+          <div class="form-group">
+            <label>Pizza Ingredient Preferences:</label>
+            <div class="ingredient-table">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Ingredient</th>
+                    <th>Will Not Eat</th>
+                    <th>Indifferent</th>
+                    <th>Want to Eat</th>
+                  </tr>
+                </thead>
+                <tbody id="ingredientTableBody">
+                  <!-- Will be populated by JavaScript -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+          <button type="submit" class="pizza-button">Join the Party! 🍕</button>
+        </form>
+        <button id="backToHome" class="pizza-button back-button">
+          ← Back to Home
+        </button>
+      </div>
+      <!-- PLANNER Form Screen -->
+      <div id="plannerContainer">
+        <div class="pizza-header">
+          <h2>🍕 I'm a Planner</h2>
+          <p>Check your pizza party status!</p>
+        </div>
+        <form id="plannerForm" class="pizza-form">
+          <div class="form-group">
+            <label for="plannerPartyNumber"
+              >Pizza Party ID (4 characters):</label
+            >
+            <input
+              type="text"
+              id="plannerPartyNumber"
+              name="plannerPartyNumber"
+              maxlength="4"
+              pattern="[A-Za-z0-9]{4}"
+              placeholder="e.g., A1B2"
+              required
+            />
+          </div>
+          <button type="submit" class="pizza-button">
+            Check Party Status! 🍕
+          </button>
+        </form>
+        <button id="backToHomePlanner" class="pizza-button back-button">
+          ← Back to Home
+        </button>
+      </div>
+
+      <!-- PLANNER Results Screen -->
+      <div id="plannerResultsContainer">
+        <div class="pizza-header">
+          <h2>🍕 Pizza Party Summary</h2>
+          <p>Party #<span id="partyNumberDisplay"></span></p>
+        </div>
+        <div class="party-image">
+          <img
+            src="{{ url_for('static', filename='pizzaparty.png') }}"
+            alt="Pizza Party"
+            class="summary-image"
+          />
+        </div>
+        <div class="party-summary">
+          <div class="summary-card">
+            <h3>👥 Attendees</h3>
+            <div id="attendeesList"></div>
+          </div>
+          <div class="summary-card">
+            <h3>🍕 Total Slices</h3>
+            <div id="totalSlices"></div>
+          </div>
+          <div class="summary-card">
+            <h3>🏆 Top 3 Most Wanted Ingredients</h3>
+            <div id="topToppings"></div>
+          </div>
+        </div>
+        <button id="backToPlanner" class="pizza-button back-button">
+          ← Back to Planner
+        </button>
+      </div>
+
+      <!-- Override Screen -->
+      <div id="overrideContainer">
+        <div class="pizza-header">
+          <h2 id="overrideMessage">Auntie Lynn says hi! 🍕</h2>
+        </div>
+        <div class="override-content">
+          <img
+            id="overrideImage"
+            src=""
+            alt="Special Message"
+            class="override-image"
+          />
+        </div>
+        <button id="backToHomeFromOverride" class="pizza-button back-button">
+          ← Back to Home
+        </button>
+      </div>
+      <footer id="siteFooter">
+        <a href="https://twitter.com/michaelbcurrie" target="_blank">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 24 24"
+            width="20"
+            height="20"
+            fill="currentColor"
+          >
+            <path
+              d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"
+            />
+          </svg>
+          @michaelbcurrie
+        </a>
+      </footer>
+    </div>
+    <script src="{{ url_for('static', filename='pizza.js') }}"></script>
+  </body>
+</html>
