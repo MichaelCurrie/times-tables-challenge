@@ -530,6 +530,85 @@ footer svg {
   border-top: none;
 }
 
+/* Creator button styling */
+.creator-button {
+  background: linear-gradient(45deg, #8e44ad, #9b59b6);
+  color: white;
+}
+
+.creator-button:hover {
+  background: linear-gradient(45deg, #7d3c98, #8e44ad);
+}
+
+/* Ingredient checkboxes styling */
+.ingredient-checkboxes {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  max-height: 300px;
+  overflow-y: auto;
+  border: 2px solid #e0e0e0;
+  border-radius: 8px;
+  padding: 15px;
+  background-color: white;
+}
+
+.ingredient-checkbox-item {
+  display: flex;
+  align-items: center;
+  padding: 8px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.ingredient-checkbox-item:hover {
+  background-color: #f8f9fa;
+}
+
+.ingredient-checkbox-item.selected {
+  background-color: #e3f2fd;
+  border: 2px solid #2196f3;
+}
+
+.ingredient-checkbox-item input[type="checkbox"] {
+  margin-right: 12px;
+  transform: scale(1.2);
+  cursor: pointer;
+}
+
+.ingredient-checkbox-item label {
+  cursor: pointer;
+  font-size: 16px;
+  font-weight: 500;
+  color: #333;
+  flex: 1;
+}
+
+.ingredient-checkbox-item.disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.ingredient-checkbox-item.disabled input[type="checkbox"] {
+  cursor: not-allowed;
+}
+
+.ingredient-checkbox-item.disabled label {
+  cursor: not-allowed;
+}
+
+.ingredient-counter {
+  text-align: center;
+  margin-top: 10px;
+  font-weight: bold;
+  color: #666;
+}
+
+.ingredient-counter.limit-reached {
+  color: #f44336;
+}
+
 /* ==========================================================================
    On‑Screen Keypad (Mobile)
    ========================================================================== */
@@ -930,7 +1009,8 @@ body.pizza-theme footer a:hover {
 #eaterContainer,
 #plannerContainer,
 #plannerResultsContainer,
-#overrideContainer {
+#overrideContainer,
+#creatorContainer {
   display: none;
   flex-direction: column;
   justify-content: flex-start;

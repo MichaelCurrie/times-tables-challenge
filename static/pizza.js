@@ -9,20 +9,24 @@ document.addEventListener("DOMContentLoaded", function () {
     "plannerResultsContainer",
   );
   const overrideContainer = document.getElementById("overrideContainer");
+  const creatorContainer = document.getElementById("creatorContainer");
 
   // Get all the buttons
   const plannerButton = document.getElementById("plannerButton");
   const eaterButton = document.getElementById("eaterButton");
+  const creatorButton = document.getElementById("creatorButton");
   const backToHome = document.getElementById("backToHome");
   const backToHomePlanner = document.getElementById("backToHomePlanner");
   const backToPlanner = document.getElementById("backToPlanner");
   const backToHomeFromOverride = document.getElementById(
     "backToHomeFromOverride",
   );
+  const backToHomeFromCreator = document.getElementById("backToHomeFromCreator");
 
   // Get forms
   const eaterForm = document.getElementById("eaterForm");
   const plannerForm = document.getElementById("plannerForm");
+  const creatorForm = document.getElementById("creatorForm");
 
   // Initialize ingredient preferences table
   let ingredientPreferences = {};
@@ -124,6 +128,7 @@ document.addEventListener("DOMContentLoaded", function () {
     plannerContainer.style.display = "none";
     plannerResultsContainer.style.display = "none";
     overrideContainer.style.display = "none";
+    creatorContainer.style.display = "none";
 
     // Show the requested screen
     screen.style.display = "flex";
@@ -144,6 +149,15 @@ document.addEventListener("DOMContentLoaded", function () {
     // Auto-focus the first input field for better UX
     setTimeout(() => {
       document.getElementById("partyNumber").focus();
+    }, 100);
+  });
+
+  creatorButton.addEventListener("click", () => {
+    showScreen(creatorContainer);
+    populateIngredientCheckboxes();
+    // Auto-focus the pizza name input field
+    setTimeout(() => {
+      document.getElementById("pizzaName").focus();
     }, 100);
   });
 
@@ -345,6 +359,115 @@ document.addEventListener("DOMContentLoaded", function () {
   setupCustomSliceSpinner();
   setupPizzaOptions();
 
+  // Populate ingredient checkboxes for creator screen
+  function populateIngredientCheckboxes() {
+    const checkboxContainer = document.getElementById("ingredientCheckboxes");
+    if (!checkboxContainer) return;
+
+    // Clear existing content
+    checkboxContainer.innerHTML = "";
+
+    // Use the same categorized ingredients as the eater form
+    const ingredientCategories = {
+      "MEAT": [
+        "anchovies", "bacon", "beef", "chicken", "ham", "pepperoni", "sausage"
+      ],
+      "VEGETABLES": [
+        "artichokes", "bell-peppers", "mushrooms", "olives", "onions", "pineapple", "spinach", "tomatoes"
+      ],
+      "HERBS AND CHEESES": [
+        "basil", "extra-cheese", "garlic", "vegan-cheese"
+      ]
+    };
+
+    // Ingredient icons mapping
+    const ingredientIcons = {
+      pepperoni: "🍕", mushrooms: "🍄", sausage: "🌭", bacon: "🥓", ham: "🥩",
+      chicken: "🍗", beef: "🥩", anchovies: "🐟", olives: "🫒", "bell-peppers": "🫑",
+      onions: "🧅", tomatoes: "🍅", pineapple: "🍍", spinach: "🥬", artichokes: "🥬",
+      "extra-cheese": "🧀", "vegan-cheese": "🧀", basil: "🌿", garlic: "🧄"
+    };
+
+    // Create checkboxes for all ingredients
+    const allIngredients = [...ingredientCategories.MEAT, ...ingredientCategories.VEGETABLES, ...ingredientCategories["HERBS AND CHEESES"]];
+    
+    allIngredients.forEach((ingredient) => {
+      const icon = ingredientIcons[ingredient] || "🍕";
+      const displayName = ingredient.charAt(0).toUpperCase() + ingredient.slice(1).replace("-", " ");
+      
+      const checkboxItem = document.createElement("div");
+      checkboxItem.className = "ingredient-checkbox-item";
+      checkboxItem.innerHTML = `
+        <input type="checkbox" id="creator_${ingredient}" name="creatorIngredients" value="${ingredient}">
+        <label for="creator_${ingredient}">${icon} ${displayName}</label>
+      `;
+      
+      checkboxContainer.appendChild(checkboxItem);
+    });
+
+    // Setup checkbox functionality
+    setupIngredientCheckboxes();
+  }
+
+  // Setup ingredient checkbox functionality with 3-ingredient limit
+  function setupIngredientCheckboxes() {
+    const checkboxes = document.querySelectorAll('input[name="creatorIngredients"]');
+    const selectedCountSpan = document.getElementById('selectedCount');
+    const counter = document.querySelector('.ingredient-counter');
+
+    checkboxes.forEach(checkbox => {
+      const checkboxItem = checkbox.closest('.ingredient-checkbox-item');
+      
+      // Make the entire item clickable
+      checkboxItem.addEventListener('click', (e) => {
+        if (e.target !== checkbox) {
+          e.preventDefault();
+          if (!checkboxItem.classList.contains('disabled')) {
+            checkbox.checked = !checkbox.checked;
+            checkbox.dispatchEvent(new Event('change'));
+          }
+        }
+      });
+
+      checkbox.addEventListener('change', () => {
+        const checkedBoxes = document.querySelectorAll('input[name="creatorIngredients"]:checked');
+        const count = checkedBoxes.length;
+        
+        selectedCountSpan.textContent = count;
+        
+        if (count >= 3) {
+          counter.classList.add('limit-reached');
+          // Disable unchecked checkboxes
+          checkboxes.forEach(cb => {
+            const item = cb.closest('.ingredient-checkbox-item');
+            if (!cb.checked) {
+              item.classList.add('disabled');
+              cb.disabled = true;
+            }
+          });
+        } else {
+          counter.classList.remove('limit-reached');
+          // Enable all checkboxes
+          checkboxes.forEach(cb => {
+            const item = cb.closest('.ingredient-checkbox-item');
+            item.classList.remove('disabled');
+            cb.disabled = false;
+          });
+        }
+        
+        // Update visual state
+        checkboxes.forEach(cb => {
+          const item = cb.closest('.ingredient-checkbox-item');
+          if (cb.checked) {
+            item.classList.add('selected');
+          } else {
+            item.classList.remove('selected');
+          }
+        });
+      });
+    });
+  }
+
   backToHome.addEventListener("click", () => {
     showScreen(startScreen);
   });
@@ -358,6 +481,10 @@ document.addEventListener("DOMContentLoaded", function () {
   });
 
   backToHomeFromOverride.addEventListener("click", () => {
+    showScreen(startScreen);
+  });
+
+  backToHomeFromCreator.addEventListener("click", () => {
     showScreen(startScreen);
   });
 
@@ -488,6 +615,76 @@ document.addEventListener("DOMContentLoaded", function () {
       }
     } catch (error) {
       alert("Error fetching party summary: " + error.message);
+    }
+  });
+
+  // Creator form submission
+  creatorForm.addEventListener("submit", async (e) => {
+    e.preventDefault();
+
+    const formData = new FormData(creatorForm);
+    const pizzaName = formData.get("pizzaName").trim();
+    
+    // Get selected ingredients
+    const selectedIngredients = [];
+    const checkedBoxes = document.querySelectorAll('input[name="creatorIngredients"]:checked');
+    checkedBoxes.forEach(checkbox => {
+      selectedIngredients.push(checkbox.value);
+    });
+
+    // Validation
+    if (!pizzaName) {
+      alert("Please enter a pizza name");
+      return;
+    }
+
+    if (selectedIngredients.length === 0) {
+      alert("Please select at least one ingredient");
+      return;
+    }
+
+    if (selectedIngredients.length > 3) {
+      alert("Please select no more than 3 ingredients");
+      return;
+    }
+
+    const data = {
+      pizzaName: pizzaName,
+      ingredients: selectedIngredients
+    };
+
+    try {
+      const response = await fetch("/pizza/create", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(data),
+      });
+
+      const result = await response.json();
+
+      if (result.success) {
+        alert(`Pizza "${pizzaName}" created successfully! 🍕`);
+        creatorForm.reset();
+        document.getElementById('selectedCount').textContent = '0';
+        document.querySelector('.ingredient-counter').classList.remove('limit-reached');
+        
+        // Reset all checkboxes and their visual state
+        const checkboxes = document.querySelectorAll('input[name="creatorIngredients"]');
+        checkboxes.forEach(cb => {
+          cb.checked = false;
+          cb.disabled = false;
+          const item = cb.closest('.ingredient-checkbox-item');
+          item.classList.remove('selected', 'disabled');
+        });
+        
+        showScreen(startScreen);
+      } else {
+        alert("Error: " + result.error);
+      }
+    } catch (error) {
+      alert("Error creating pizza: " + error.message);
     }
   });
 

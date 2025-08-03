@@ -358,6 +358,70 @@ def get_pizza_ingredients() -> Dict[str, List[str]]:
     return jsonify({"ingredients": PIZZA_INGREDIENTS})
 
 
+@app.route("/pizza/create", methods=["POST"])
+def create_pizza() -> Dict[str, Any]:
+    """
+    Create a named pizza for all parties.
+
+    Returns:
+        Dict[str, Any]: JSON response with success status
+    """
+    data = request.get_json()
+    pizza_name = data.get("pizzaName")
+    ingredients = data.get("ingredients", [])
+
+    if not pizza_name:
+        return jsonify({"error": "Pizza name is required"}), 400
+
+    if not ingredients:
+        return jsonify({"error": "At least one ingredient is required"}), 400
+
+    if len(ingredients) > 3:
+        return jsonify({"error": "Maximum of 3 ingredients allowed"}), 400
+
+    # Validate ingredients against available list
+    valid_ingredients = set(PIZZA_INGREDIENTS)
+    for ingredient in ingredients:
+        if ingredient not in valid_ingredients:
+            return jsonify({"error": f"Invalid ingredient: {ingredient}"}), 400
+
+    conn = sqlite3.connect(DATABASE)
+    cur = conn.cursor()
+
+    try:
+        # Check if pizza name already exists
+        cur.execute("SELECT id FROM named_pizzas WHERE name = ?", (pizza_name,))
+        if cur.fetchone():
+            return jsonify({"error": f"Pizza with name '{pizza_name}' already exists"}), 400
+
+        # Insert the named pizza
+        cur.execute(
+            "INSERT INTO named_pizzas (name) VALUES (?)",
+            (pizza_name,)
+        )
+        pizza_id = cur.lastrowid
+
+        # Insert the ingredients
+        for ingredient in ingredients:
+            cur.execute(
+                "INSERT INTO named_pizzas_ingredients (pizza_id, ingredient) VALUES (?, ?)",
+                (pizza_id, ingredient)
+            )
+
+        conn.commit()
+        conn.close()
+
+        return jsonify({
+            "success": True,
+            "message": f"Pizza '{pizza_name}' created successfully!",
+            "pizza_id": pizza_id
+        })
+
+    except Exception as e:
+        conn.close()
+        return jsonify({"error": str(e)}), 500
+
+
 @app.route("/pizza/summary/<party_id>", methods=["GET"])
 def get_pizza_party_summary(party_id: str) -> Dict[str, Any]:
     """

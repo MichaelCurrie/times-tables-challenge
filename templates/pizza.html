@@ -44,6 +44,14 @@
           >
             🍽️ EATER
           </button>
+          <button
+            class="pizza-button creator-button"
+            id="creatorButton"
+            aria-label="Create a Pizza"
+            role="button"
+          >
+            👨‍🍳 CREATE A PIZZA
+          </button>
         </div>
         <div class="share-section" id="shareSection" style="display: none;">
           <button
@@ -254,6 +262,35 @@
           />
         </div>
         <button id="backToHomeFromOverride" class="pizza-button back-button">
+          ← Back to Home
+        </button>
+      </div>
+
+      <!-- CREATE A PIZZA Screen -->
+      <div id="creatorContainer">
+        <div class="pizza-header">
+          <h2>👨‍🍳 Create a Pizza</h2>
+          <p>Design a custom pizza for everyone!</p>
+        </div>
+        <form id="creatorForm" class="pizza-form">
+          <div class="form-group">
+            <label for="pizzaName">Pizza Name:</label>
+            <input type="text" id="pizzaName" name="pizzaName" placeholder="e.g., The Ultimate Supreme" required />
+          </div>
+          
+          <div class="form-group">
+            <label class="section-label">🍕 Choose up to 3 ingredients</label>
+            <div class="ingredient-checkboxes" id="ingredientCheckboxes">
+              <!-- Will be populated by JavaScript -->
+            </div>
+            <div class="ingredient-counter">
+              <span id="selectedCount">0</span> / 3 ingredients selected
+            </div>
+          </div>
+          
+          <button type="submit" class="pizza-button">Create Pizza! 🍕</button>
+        </form>
+        <button id="backToHomeFromCreator" class="pizza-button back-button">
           ← Back to Home
         </button>
       </div>
