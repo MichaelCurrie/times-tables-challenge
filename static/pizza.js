@@ -128,6 +128,31 @@ document.addEventListener("DOMContentLoaded", function () {
     }, 100);
   });
 
+  // Add real-time case formatting for input fields
+  function setupInputFormatting() {
+    // Party ID fields - force uppercase
+    const partyIdInputs = document.querySelectorAll('#partyNumber, #plannerPartyNumber');
+    partyIdInputs.forEach(input => {
+      input.addEventListener('input', function() {
+        this.value = this.value.toUpperCase();
+      });
+    });
+
+    // Name field - force title case
+    const nameInput = document.getElementById('eaterName');
+    if (nameInput) {
+      nameInput.addEventListener('input', function() {
+        const value = this.value;
+        if (value.length > 0) {
+          this.value = value.charAt(0).toUpperCase() + value.slice(1).toLowerCase();
+        }
+      });
+    }
+  }
+
+  // Initialize input formatting when DOM is loaded
+  setupInputFormatting();
+
   backToHome.addEventListener("click", () => {
     showScreen(startScreen);
   });
@@ -194,7 +219,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
     const data = {
       partyNumber: partyId.toUpperCase(),
-      name: formData.get("eaterName").toUpperCase(),
+      name: formData.get("eaterName").charAt(0).toUpperCase() + formData.get("eaterName").slice(1).toLowerCase(),
       sliceCount: parseInt(formData.get("sliceCount")),
       preferences: preferences,
     };
