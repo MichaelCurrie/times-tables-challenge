@@ -316,25 +316,9 @@ document.addEventListener("DOMContentLoaded", function () {
     }
   }
   
-  // Setup pizza option selection
+  // Setup pizza option selection (no longer needed with radio buttons removed)
   function setupPizzaOptions() {
-    const pizzaOptions = document.querySelectorAll('.pizza-option');
-    
-    pizzaOptions.forEach(option => {
-      const radio = option.querySelector('input[type="radio"]');
-      const label = option.querySelector('label');
-      
-      // Make the entire option clickable
-      option.addEventListener('click', () => {
-        radio.checked = true;
-        // Trigger change event for any listeners
-        radio.dispatchEvent(new Event('change'));
-      });
-      
-      // Prevent double-clicking when clicking on radio or label
-      radio.addEventListener('click', (e) => e.stopPropagation());
-      label.addEventListener('click', (e) => e.stopPropagation());
-    });
+    // No radio button functionality needed anymore
   }
   
   // Initialize pizza slice spinners and pizza options
@@ -371,10 +355,7 @@ document.addEventListener("DOMContentLoaded", function () {
       return;
     }
 
-    // Get selected pizza choice
-    const pizzaChoice = formData.get("pizzaChoice");
-    
-    // Collect ingredient preferences
+    // Collect ingredient preferences for custom pizza
     const preferences = {};
     const defaultIngredients = [
       "pepperoni",
@@ -398,29 +379,10 @@ document.addEventListener("DOMContentLoaded", function () {
       "garlic",
     ];
 
-    // Set preferences based on pizza choice
+    // Set all preferences to indifferent by default
     defaultIngredients.forEach((ingredient) => {
       preferences[ingredient] = 1; // Default to indifferent
     });
-
-    // Override preferences based on selected pizza
-    switch (pizzaChoice) {
-      case "pepperoni":
-        preferences["pepperoni"] = 2; // Want
-        break;
-      case "cheese":
-        // Keep all as indifferent (cheese only)
-        break;
-      case "pineapple-ham":
-        preferences["pineapple"] = 2; // Want
-        preferences["ham"] = 2; // Want
-        break;
-      case "spinach-tomato-pineapple":
-        preferences["spinach"] = 2; // Want
-        preferences["tomatoes"] = 2; // Want
-        preferences["pineapple"] = 2; // Want
-        break;
-    }
 
     // Override with custom preferences if user made any changes
     defaultIngredients.forEach((ingredient) => {
@@ -435,12 +397,14 @@ document.addEventListener("DOMContentLoaded", function () {
     // Calculate total slices from all pizza selections
     const pizzaSliceInputs = document.querySelectorAll('.pizza-slice-input');
     let totalSlices = 0;
-    const pizzaSelections = {};
+    const existingPizza_slicesWanted = {};
     
     pizzaSliceInputs.forEach(input => {
       const pizzaType = input.getAttribute('data-pizza');
       const slices = parseInt(input.value) || 0;
-      pizzaSelections[pizzaType] = slices;
+      if (slices > 0) {
+        existingPizza_slicesWanted[pizzaType] = slices;
+      }
       totalSlices += slices;
     });
     
@@ -451,10 +415,11 @@ document.addEventListener("DOMContentLoaded", function () {
     const data = {
       partyNumber: partyId.toUpperCase(),
       name: formData.get("eaterName").charAt(0).toUpperCase() + formData.get("eaterName").slice(1).toLowerCase(),
-      sliceCount: totalSlices,
-      preferences: preferences,
-      pizzaSelections: pizzaSelections,
-      customSlices: customSlices
+      custom_pizza: {
+        sliceCount: customSlices,
+        preferences: preferences
+      },
+      existingPizza_slicesWanted: existingPizza_slicesWanted
     };
 
     try {
