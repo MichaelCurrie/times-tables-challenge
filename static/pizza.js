@@ -450,21 +450,28 @@ document.addEventListener("DOMContentLoaded", function () {
       "extra-cheese": "🧀", "vegan-cheese": "🧀", basil: "🌿", garlic: "🧄"
     };
 
-    // Create checkboxes for all ingredients
-    const allIngredients = [...ingredientCategories.MEAT, ...ingredientCategories.VEGETABLES, ...ingredientCategories["HERBS AND CHEESES"]];
-    
-    allIngredients.forEach((ingredient) => {
-      const icon = ingredientIcons[ingredient] || "🍕";
-      const displayName = ingredient.charAt(0).toUpperCase() + ingredient.slice(1).replace("-", " ");
-      
-      const checkboxItem = document.createElement("div");
-      checkboxItem.className = "ingredient-checkbox-item";
-      checkboxItem.innerHTML = `
-        <input type="checkbox" id="creator_${ingredient}" name="creatorIngredients" value="${ingredient}">
-        <label for="creator_${ingredient}">${icon} ${displayName}</label>
-      `;
-      
-      checkboxContainer.appendChild(checkboxItem);
+    // Create categorized sections with checkboxes
+    Object.keys(ingredientCategories).forEach(categoryName => {
+      // Create section header
+      const headerDiv = document.createElement("div");
+      headerDiv.className = "ingredient-category-header-checkbox";
+      headerDiv.innerHTML = `<strong>${categoryName}</strong>`;
+      checkboxContainer.appendChild(headerDiv);
+
+      // Add ingredients for this category
+      ingredientCategories[categoryName].forEach((ingredient) => {
+        const icon = ingredientIcons[ingredient] || "🍕";
+        const displayName = ingredient.charAt(0).toUpperCase() + ingredient.slice(1).replace("-", " ");
+        
+        const checkboxItem = document.createElement("div");
+        checkboxItem.className = "ingredient-checkbox-item";
+        checkboxItem.innerHTML = `
+          <input type="checkbox" id="creator_${ingredient}" name="creatorIngredients" value="${ingredient}">
+          <label for="creator_${ingredient}">${icon} ${displayName}</label>
+        `;
+        
+        checkboxContainer.appendChild(checkboxItem);
+      });
     });
 
     // Setup checkbox functionality

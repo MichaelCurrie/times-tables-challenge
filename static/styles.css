@@ -612,10 +612,12 @@ footer svg {
   gap: 8px;
   max-height: 300px;
   overflow-y: auto;
-  border: 2px solid #e0e0e0;
+  border: 2px solid #e55a2b;
   border-radius: 8px;
   padding: 15px;
-  background-color: white;
+  background-color: #ff6b35;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .ingredient-checkbox-item {
@@ -646,7 +648,7 @@ footer svg {
   cursor: pointer;
   font-size: 16px;
   font-weight: 500;
-  color: #333;
+  color: white;
   flex: 1;
 }
 
@@ -672,6 +674,21 @@ footer svg {
 
 .ingredient-counter.limit-reached {
   color: #f44336;
+}
+
+.ingredient-category-header-checkbox {
+  background-color: #e55a2b;
+  color: white;
+  text-align: center;
+  padding: 8px 12px;
+  font-size: 14px;
+  font-weight: bold;
+  border-radius: 6px;
+  margin: 10px 0 8px 0;
+}
+
+.ingredient-category-header-checkbox:first-child {
+  margin-top: 0;
 }
 
 /* ==========================================================================
