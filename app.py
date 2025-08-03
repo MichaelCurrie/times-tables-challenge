@@ -838,6 +838,52 @@ def calculate_pizza_orders(
     return pizza_orders
 
 
+def format_pizza_count(slices: int) -> str:
+    """
+    Format pizza count based on 8 slices per pizza, rounded up to nearest 4.
+    
+    Args:
+        slices (int): Number of slices needed
+        
+    Returns:
+        str: Formatted pizza count string (e.g., "1 1/2 pizzas, 2 slices excess")
+    """
+    slices_per_pizza = 8
+    whole_pizzas = slices // slices_per_pizza
+    remaining_slices = slices % slices_per_pizza
+    
+    # Round up remaining slices to nearest 4
+    rounded_up_slices = ((remaining_slices + 3) // 4) * 4 if remaining_slices > 0 else 0
+    excess_slices = rounded_up_slices - remaining_slices
+    
+    result = ""
+    
+    if whole_pizzas > 0:
+        result += str(whole_pizzas)
+        if rounded_up_slices > 0:
+            if rounded_up_slices == 4:
+                result += " 1/2"
+            elif rounded_up_slices == 8:
+                result += " 1"
+            result += " pizzas"
+        else:
+            result += " pizza" if whole_pizzas == 1 else " pizzas"
+    else:
+        # Less than a full pizza
+        if rounded_up_slices == 4:
+            result = "1/2 pizza"
+        elif rounded_up_slices == 8:
+            result = "1 pizza"
+        else:
+            result = "1 pizza"  # fallback
+    
+    if excess_slices > 0:
+        plural = "s" if excess_slices > 1 else ""
+        result += f" ({excess_slices} slice{plural} excess)"
+    
+    return result
+
+
 def calculate_comprehensive_pizza_orders(
     party_id: str,
     attendees: List[Tuple[int, str, int]],
@@ -928,6 +974,7 @@ def calculate_comprehensive_pizza_orders(
                         "type": f"{pizza_name} (Boring Basic)",
                         "ingredients": ingredients,
                         "slices": total_slices,
+                        "pizza_count": format_pizza_count(total_slices),
                         "description": f"Pre-selected {pizza_name.lower()} pizza",
                         "target_eaters": eater_names.split(", ") if eater_names else [],
                         "source": "boring_basic",
@@ -972,6 +1019,7 @@ def calculate_comprehensive_pizza_orders(
                     "type": f"{pizza_name} (Custom)",
                     "ingredients": ingredients,
                     "slices": custom_selection[0],
+                    "pizza_count": format_pizza_count(custom_selection[0]),
                     "description": f"Custom created pizza: {pizza_name}",
                     "target_eaters": (
                         custom_selection[1].split(", ") if custom_selection[1] else []
@@ -996,6 +1044,7 @@ def calculate_comprehensive_pizza_orders(
         ai_order["calculation_method"] = (
             "AI-optimized based on attendee preferences and slice requirements"
         )
+        ai_order["pizza_count"] = format_pizza_count(ai_order["slices"])
         ai_order["type"] = f"{ai_order['type']} (AI Recommended)"
         comprehensive_orders.append(ai_order)
 
