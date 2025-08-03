@@ -605,8 +605,8 @@ footer svg {
   border-top: none;
 }
 
-/* Want to Eat limit styling */
-.want-limit-reached {
+/* Must Have limit styling */
+.must-have-limit-reached {
   opacity: 0.5;
   background-color: #f5f5f5;
 }

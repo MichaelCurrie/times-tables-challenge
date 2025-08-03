@@ -434,7 +434,7 @@ document.addEventListener("DOMContentLoaded", function () {
     return pizzaOption;
   }
 
-  // Setup ingredient limits (max 3 "Want to Eat" selections)
+      // Setup ingredient limits (max 3 "Must Have" selections)
   function setupIngredientLimits() {
     const allIngredients = [
       // MEAT
@@ -445,7 +445,7 @@ document.addEventListener("DOMContentLoaded", function () {
       "basil", "extra-cheese", "garlic", "vegan-cheese"
     ];
 
-    // Add event listeners to all "Want to Eat" radio buttons
+            // Add event listeners to all "Must Have" radio buttons
     allIngredients.forEach(ingredient => {
       const wantRadio = document.querySelector(`input[name="pref_${ingredient}"][value="2"]`);
       if (wantRadio) {
@@ -458,7 +458,7 @@ document.addEventListener("DOMContentLoaded", function () {
     });
   }
 
-  // Check and enforce the 3-ingredient "Want to Eat" limit
+  // Check and enforce the 3-ingredient "Must Have" limit
   function checkAndEnforceWantLimit() {
     const allIngredients = [
       "anchovies", "bacon", "beef", "chicken", "ham", "pepperoni", "sausage",
@@ -466,7 +466,7 @@ document.addEventListener("DOMContentLoaded", function () {
       "basil", "extra-cheese", "garlic", "vegan-cheese"
     ];
 
-    // Count currently selected "Want to Eat" items
+    // Count currently selected "Must Have" items
     const wantSelections = [];
     allIngredients.forEach(ingredient => {
       const wantRadio = document.querySelector(`input[name="pref_${ingredient}"][value="2"]`);
@@ -475,7 +475,7 @@ document.addEventListener("DOMContentLoaded", function () {
       }
     });
 
-    // If more than 3, disable other "Want to Eat" options
+    // If more than 3, disable other "Must Have" options
     if (wantSelections.length >= 3) {
       allIngredients.forEach(ingredient => {
         const wantRadio = document.querySelector(`input[name="pref_${ingredient}"][value="2"]`);
@@ -489,7 +489,7 @@ document.addEventListener("DOMContentLoaded", function () {
         }
       });
     } else {
-      // Re-enable all "Want to Eat" options
+      // Re-enable all "Must Have" options
       allIngredients.forEach(ingredient => {
         const wantRadio = document.querySelector(`input[name="pref_${ingredient}"][value="2"]`);
         if (wantRadio) {
@@ -506,7 +506,7 @@ document.addEventListener("DOMContentLoaded", function () {
     updateWantCounter(wantSelections.length);
   }
 
-  // Update the "Want to Eat" counter display
+  // Update the "Must Have" counter display
   function updateWantCounter(count) {
     let counterElement = document.getElementById('wantCounter');
     if (!counterElement) {
@@ -521,7 +521,7 @@ document.addEventListener("DOMContentLoaded", function () {
     }
     
     if (counterElement) {
-      counterElement.innerHTML = `<strong>${count} / 3 ingredients selected as "Want to Eat"</strong>`;
+      counterElement.innerHTML = `<strong>${count} / 3 ingredients selected as "Must Have"</strong>`;
       if (count >= 3) {
         counterElement.classList.add('limit-reached');
       } else {
