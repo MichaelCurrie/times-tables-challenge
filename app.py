@@ -162,6 +162,15 @@ def join_pizza_party() -> Dict[str, Any]:
     cur = conn.cursor()
     
     try:
+        # Check if someone with this name has already joined this party
+        cur.execute("""
+            SELECT id FROM pizza_attendees 
+            WHERE party_number = ? AND name = ?
+        """, (party_id.upper(), name))
+        
+        if cur.fetchone():
+            return jsonify({"error": f"Someone with the name '{name}' has already joined this party. Please use a different name or ask the party organizer for help."}), 400
+        
         # Check for attendee overrides
         override_info = None
         for override in ATTENDEE_OVERRIDES:
