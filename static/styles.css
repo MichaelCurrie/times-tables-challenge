@@ -610,8 +610,6 @@ footer svg {
   display: flex;
   flex-direction: column;
   gap: 8px;
-  max-height: 300px;
-  overflow-y: auto;
   border: 2px solid #e55a2b;
   border-radius: 8px;
   padding: 15px;
@@ -1056,6 +1054,11 @@ body.pizza-theme footer a:hover {
   backdrop-filter: blur(10px);
   position: relative;
   z-index: 3;
+}
+
+/* Creator form - make it wider */
+#creatorForm {
+  max-width: 800px;
 }
 
 .form-group {
