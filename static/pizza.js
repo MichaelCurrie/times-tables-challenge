@@ -268,16 +268,41 @@ document.addEventListener("DOMContentLoaded", function () {
   setupShareButton();
   updateShareButtonVisibility();
   
-  // Setup slice spinner functionality
-  function setupSliceSpinner() {
-    const decreaseBtn = document.getElementById('decreaseSlices');
-    const increaseBtn = document.getElementById('increaseSlices');
-    const sliceInput = document.getElementById('sliceCount');
+  // Setup pizza slice spinners functionality
+  function setupPizzaSliceSpinners() {
+    const spinnerButtons = document.querySelectorAll('.mini-spinner-btn');
+    
+    spinnerButtons.forEach(button => {
+      button.addEventListener('click', (e) => {
+        e.stopPropagation(); // Prevent triggering pizza option selection
+        
+        const pizzaType = button.getAttribute('data-pizza');
+        const action = button.getAttribute('data-action');
+        const input = document.querySelector(`input[data-pizza="${pizzaType}"]`);
+        
+        if (input) {
+          let currentValue = parseInt(input.value);
+          
+          if (action === 'decrease' && currentValue > 0) {
+            input.value = currentValue - 1;
+          } else if (action === 'increase' && currentValue < 10) {
+            input.value = currentValue + 1;
+          }
+        }
+      });
+    });
+  }
+  
+  // Setup custom pizza slice spinner functionality
+  function setupCustomSliceSpinner() {
+    const decreaseBtn = document.getElementById('decreaseCustomSlices');
+    const increaseBtn = document.getElementById('increaseCustomSlices');
+    const sliceInput = document.getElementById('customSliceCount');
     
     if (decreaseBtn && increaseBtn && sliceInput) {
       decreaseBtn.addEventListener('click', () => {
         const currentValue = parseInt(sliceInput.value);
-        if (currentValue > 1) {
+        if (currentValue > 0) {
           sliceInput.value = currentValue - 1;
         }
       });
@@ -312,8 +337,9 @@ document.addEventListener("DOMContentLoaded", function () {
     });
   }
   
-  // Initialize slice spinner and pizza options
-  setupSliceSpinner();
+  // Initialize pizza slice spinners and pizza options
+  setupPizzaSliceSpinners();
+  setupCustomSliceSpinner();
   setupPizzaOptions();
 
   backToHome.addEventListener("click", () => {
@@ -406,11 +432,29 @@ document.addEventListener("DOMContentLoaded", function () {
       }
     });
 
+    // Calculate total slices from all pizza selections
+    const pizzaSliceInputs = document.querySelectorAll('.pizza-slice-input');
+    let totalSlices = 0;
+    const pizzaSelections = {};
+    
+    pizzaSliceInputs.forEach(input => {
+      const pizzaType = input.getAttribute('data-pizza');
+      const slices = parseInt(input.value) || 0;
+      pizzaSelections[pizzaType] = slices;
+      totalSlices += slices;
+    });
+    
+    // Add custom pizza slices
+    const customSlices = parseInt(formData.get("customSliceCount")) || 0;
+    totalSlices += customSlices;
+    
     const data = {
       partyNumber: partyId.toUpperCase(),
       name: formData.get("eaterName").charAt(0).toUpperCase() + formData.get("eaterName").slice(1).toLowerCase(),
-      sliceCount: parseInt(formData.get("sliceCount")),
+      sliceCount: totalSlices,
       preferences: preferences,
+      pizzaSelections: pizzaSelections,
+      customSlices: customSlices
     };
 
     try {

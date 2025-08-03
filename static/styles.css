@@ -371,6 +371,7 @@ footer svg {
 .pizza-option {
   display: flex;
   align-items: center;
+  justify-content: space-between;
   padding: 12px 16px;
   background-color: #fff;
   border: 2px solid #e0e0e0;
@@ -382,6 +383,12 @@ footer svg {
 .pizza-option:hover {
   border-color: #ff6b35;
   background-color: #fff5f2;
+}
+
+.pizza-info {
+  display: flex;
+  align-items: center;
+  flex: 1;
 }
 
 .pizza-option input[type="radio"] {
@@ -397,13 +404,57 @@ footer svg {
 .pizza-option label {
   cursor: pointer;
   font-size: 16px;
-  flex: 1;
+  color: #333;
+  font-weight: 500;
 }
 
 .pizza-option:has(input[type="radio"]:checked) {
   border-color: #ff6b35;
   background-color: #fff5f2;
   box-shadow: 0 2px 8px rgba(255, 107, 53, 0.2);
+}
+
+.pizza-slice-spinner {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.mini-spinner-btn {
+  background-color: #ff6b35;
+  color: white;
+  border: none;
+  border-radius: 50%;
+  width: 28px;
+  height: 28px;
+  font-size: 14px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.mini-spinner-btn:hover {
+  background-color: #e55a2b;
+  transform: scale(1.1);
+}
+
+.mini-spinner-btn:active {
+  transform: scale(0.95);
+}
+
+.pizza-slice-input {
+  width: 50px;
+  height: 28px;
+  text-align: center;
+  border: 2px solid #ff6b35;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: bold;
+  color: #333;
+  background-color: white;
 }
 
 /* Slice Selector Styling */
@@ -469,6 +520,17 @@ footer svg {
   outline: none;
   border-color: #e55a2b;
   box-shadow: 0 0 0 3px rgba(255, 107, 53, 0.2);
+}
+
+.custom-pizza-quantity {
+  margin-bottom: 20px;
+}
+
+.custom-pizza-quantity label {
+  display: block;
+  margin-bottom: 10px;
+  font-weight: bold;
+  color: #333;
 }
 
 /* ==========================================================================
@@ -827,7 +889,7 @@ body.pizza-theme footer a:hover {
   display: flex;
   flex-direction: column;
   gap: 20px;
-  max-width: 400px;
+  max-width: 600px;
   margin: 0 auto;
   padding: 20px;
   background: rgba(255, 255, 255, 0.2);

@@ -138,6 +138,23 @@
           <!-- MAKE A CUSTOM PIZZA section -->
           <div class="form-group">
             <label class="section-label">🍕 MAKE A CUSTOM PIZZA [Optional]</label>
+            <div class="custom-pizza-quantity">
+              <label for="customSliceCount">How many slices of custom pizza?</label>
+              <div class="spinner-container">
+                <button type="button" class="spinner-btn" id="decreaseCustomSlices">-</button>
+                <input
+                  type="number"
+                  id="customSliceCount"
+                  name="customSliceCount"
+                  min="0"
+                  max="20"
+                  value="0"
+                  required
+                  readonly
+                />
+                <button type="button" class="spinner-btn" id="increaseCustomSlices">+</button>
+              </div>
+            </div>
             <div class="ingredient-table">
               <table>
                 <thead>
