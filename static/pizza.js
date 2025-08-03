@@ -304,10 +304,6 @@ document.addEventListener("DOMContentLoaded", function () {
     }
   }
   
-  // Initialize share functionality
-  setupShareButton();
-  updateShareButtonVisibility();
-  
   // Setup pizza slice spinners functionality
   function setupPizzaSliceSpinners() {
     const spinnerButtons = document.querySelectorAll('.mini-spinner-btn');
@@ -367,6 +363,10 @@ document.addEventListener("DOMContentLoaded", function () {
   setupPizzaOptions();
   setupPreferenceButtons();
   setupIngredientLimits();
+  
+  // Initialize share functionality
+  setupShareButton();
+  updateShareButtonVisibility();
 
   // Populate available pizzas (hardcoded + custom) in the eater form
   async function populateAvailablePizzas() {
