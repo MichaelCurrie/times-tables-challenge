@@ -779,6 +779,26 @@ body.pizza-theme footer a:hover {
   font-size: 0.8em;
 }
 
+/* Pizza order styles */
+.pizza-order {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 10px;
+  padding: 15px;
+  margin: 10px 0;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.pizza-order h4 {
+  margin: 0 0 10px 0;
+  color: #fff;
+  font-size: 1.2em;
+}
+
+.pizza-order p {
+  margin: 5px 0;
+  color: rgba(255, 255, 255, 0.9);
+}
+
 /* Override screen styles */
 .override-content {
   display: flex;

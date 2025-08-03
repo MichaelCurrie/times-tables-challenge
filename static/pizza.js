@@ -149,13 +149,45 @@ document.addEventListener('DOMContentLoaded', function() {
         // Display total slices
         document.getElementById('totalSlices').textContent = `${data.total_slices} slices`;
         
-        // Display top toppings
+        // Display top ingredients (new format)
         const topToppings = document.getElementById('topToppings');
-        topToppings.innerHTML = data.top_toppings.map(([topping, count]) => 
-            `<div class="topping-item">
-                <span>${topping}</span>
-                <span class="topping-count">${count}</span>
-            </div>`
-        ).join('');
+        if (data.top_ingredients && data.top_ingredients.length > 0) {
+            topToppings.innerHTML = data.top_ingredients.map(([ingredient, count]) => 
+                `<div class="topping-item">
+                    <span>${ingredient}</span>
+                    <span class="topping-count">${count}</span>
+                </div>`
+            ).join('');
+        } else {
+            topToppings.innerHTML = '<p>No ingredient preferences recorded yet.</p>';
+        }
+        
+        // Display pizza orders if available
+        if (data.pizza_orders && data.pizza_orders.length > 0) {
+            // Add pizza orders section if it doesn't exist
+            let pizzaOrdersSection = document.getElementById('pizzaOrders');
+            if (!pizzaOrdersSection) {
+                const summaryContainer = document.querySelector('.party-summary');
+                const pizzaOrdersDiv = document.createElement('div');
+                pizzaOrdersDiv.className = 'summary-card';
+                pizzaOrdersDiv.innerHTML = `
+                    <h3>🍕 Recommended Pizza Orders</h3>
+                    <div id="pizzaOrders"></div>
+                `;
+                summaryContainer.appendChild(pizzaOrdersDiv);
+            }
+            
+            pizzaOrdersSection = document.getElementById('pizzaOrders');
+            pizzaOrdersSection.innerHTML = data.pizza_orders.map(pizza => 
+                `<div class="pizza-order">
+                    <h4>${pizza.type}</h4>
+                    <p>${pizza.description}</p>
+                    ${pizza.ingredients.length > 0 ? 
+                        `<p><strong>Ingredients:</strong> ${pizza.ingredients.join(', ')}</p>` : 
+                        '<p><strong>Ingredients:</strong> Cheese only</p>'
+                    }
+                </div>`
+            ).join('');
+        }
     }
 }); 
