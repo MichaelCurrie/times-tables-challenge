@@ -89,37 +89,48 @@
             <label class="section-label">🍕 JOIN an existing pizza</label>
             <div class="pizza-options">
               <div class="pizza-option">
-                <input type="radio" id="pizza-pepperoni" name="pizzaChoice" value="pepperoni" checked>
-                <label for="pizza-pepperoni">Pepperoni</label>
+                <div class="pizza-info">
+                  <input type="radio" id="pizza-pepperoni" name="pizzaChoice" value="pepperoni" checked>
+                  <label for="pizza-pepperoni">Pepperoni</label>
+                </div>
+                <div class="pizza-slice-spinner">
+                  <button type="button" class="mini-spinner-btn" data-pizza="pepperoni" data-action="decrease">-</button>
+                  <input type="number" class="pizza-slice-input" data-pizza="pepperoni" value="0" min="0" max="10" readonly>
+                  <button type="button" class="mini-spinner-btn" data-pizza="pepperoni" data-action="increase">+</button>
+                </div>
               </div>
               <div class="pizza-option">
-                <input type="radio" id="pizza-cheese" name="pizzaChoice" value="cheese">
-                <label for="pizza-cheese">Cheese</label>
+                <div class="pizza-info">
+                  <input type="radio" id="pizza-cheese" name="pizzaChoice" value="cheese">
+                  <label for="pizza-cheese">Cheese</label>
+                </div>
+                <div class="pizza-slice-spinner">
+                  <button type="button" class="mini-spinner-btn" data-pizza="cheese" data-action="decrease">-</button>
+                  <input type="number" class="pizza-slice-input" data-pizza="cheese" value="0" min="0" max="10" readonly>
+                  <button type="button" class="mini-spinner-btn" data-pizza="cheese" data-action="increase">+</button>
+                </div>
               </div>
               <div class="pizza-option">
-                <input type="radio" id="pizza-pineapple-ham" name="pizzaChoice" value="pineapple-ham">
-                <label for="pizza-pineapple-ham">Pineapple and Ham</label>
+                <div class="pizza-info">
+                  <input type="radio" id="pizza-pineapple-ham" name="pizzaChoice" value="pineapple-ham">
+                  <label for="pizza-pineapple-ham">Pineapple and Ham</label>
+                </div>
+                <div class="pizza-slice-spinner">
+                  <button type="button" class="mini-spinner-btn" data-pizza="pineapple-ham" data-action="decrease">-</button>
+                  <input type="number" class="pizza-slice-input" data-pizza="pineapple-ham" value="0" min="0" max="10" readonly>
+                  <button type="button" class="mini-spinner-btn" data-pizza="pineapple-ham" data-action="increase">+</button>
+                </div>
               </div>
               <div class="pizza-option">
-                <input type="radio" id="pizza-spinach-tomato-pineapple" name="pizzaChoice" value="spinach-tomato-pineapple">
-                <label for="pizza-spinach-tomato-pineapple">Spinach, Tomatoes and Pineapple</label>
-              </div>
-            </div>
-            <div class="slice-selector">
-              <label for="sliceCount">How many slices?</label>
-              <div class="spinner-container">
-                <button type="button" class="spinner-btn" id="decreaseSlices">-</button>
-                <input
-                  type="number"
-                  id="sliceCount"
-                  name="sliceCount"
-                  min="1"
-                  max="20"
-                  value="2"
-                  required
-                  readonly
-                />
-                <button type="button" class="spinner-btn" id="increaseSlices">+</button>
+                <div class="pizza-info">
+                  <input type="radio" id="pizza-spinach-tomato-pineapple" name="pizzaChoice" value="spinach-tomato-pineapple">
+                  <label for="pizza-spinach-tomato-pineapple">Spinach, Tomatoes and Pineapple</label>
+                </div>
+                <div class="pizza-slice-spinner">
+                  <button type="button" class="mini-spinner-btn" data-pizza="spinach-tomato-pineapple" data-action="decrease">-</button>
+                  <input type="number" class="pizza-slice-input" data-pizza="spinach-tomato-pineapple" value="0" min="0" max="10" readonly>
+                  <button type="button" class="mini-spinner-btn" data-pizza="spinach-tomato-pineapple" data-action="increase">+</button>
+                </div>
               </div>
             </div>
           </div>
