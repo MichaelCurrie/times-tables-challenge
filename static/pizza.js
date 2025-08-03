@@ -152,6 +152,30 @@ document.addEventListener("DOMContentLoaded", function () {
 
   // Initialize input formatting when DOM is loaded
   setupInputFormatting();
+  
+  // Check for party ID in URL and populate fields
+  function populatePartyIdFromUrl() {
+    const path = window.location.pathname;
+    const partyIdMatch = path.match(/^\/([A-Za-z0-9]{4})$/);
+    
+    if (partyIdMatch) {
+      const partyId = partyIdMatch[1].toUpperCase();
+      
+      // Populate both party ID fields
+      const eaterPartyIdField = document.getElementById('partyNumber');
+      const plannerPartyIdField = document.getElementById('plannerPartyNumber');
+      
+      if (eaterPartyIdField) {
+        eaterPartyIdField.value = partyId;
+      }
+      if (plannerPartyIdField) {
+        plannerPartyIdField.value = partyId;
+      }
+    }
+  }
+  
+  // Initialize party ID population from URL
+  populatePartyIdFromUrl();
 
   backToHome.addEventListener("click", () => {
     showScreen(startScreen);
@@ -289,6 +313,12 @@ document.addEventListener("DOMContentLoaded", function () {
   function displayPartySummary(data) {
     document.getElementById("partyNumberDisplay").textContent =
       data.party_number;
+
+    // Update attendees header with count
+    const attendeesHeader = document.querySelector('.summary-card h3');
+    if (attendeesHeader && attendeesHeader.textContent.includes('👥 Attendees')) {
+      attendeesHeader.textContent = `👥 Attendees (${data.attendees.length})`;
+    }
 
     // Display attendees
     const attendeesList = document.getElementById("attendeesList");

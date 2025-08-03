@@ -84,6 +84,30 @@ def index() -> str:
         return render_template("index.html")
 
 
+@app.route("/<party_id>")
+def pizza_party_with_id(party_id: str) -> str:
+    """
+    Serve pizza party template with pre-filled party ID.
+    
+    Args:
+        party_id (str): 4-character alphanumeric party identifier
+        
+    Returns:
+        str: Rendered HTML template for pizza party with party ID
+    """
+    # Validate party ID format
+    if not party_id or len(party_id) != 4 or not party_id.isalnum():
+        return render_template("pizza.html")
+    
+    # Check the host header to determine which template to serve
+    host = request.headers.get("Host", "").lower()
+    
+    if "slicetomeetyou.com" in host:
+        return render_template("pizza.html", party_id=party_id.upper())
+    else:
+        return render_template("index.html")
+
+
 @app.route("/submit", methods=["POST"])
 def submit() -> Dict[str, Any]:
     """
