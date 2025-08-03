@@ -1089,6 +1089,48 @@ document.addEventListener("DOMContentLoaded", function () {
     }
   });
 
+  // Format pizza count based on 8 slices per pizza, rounded up to nearest 4
+  function formatPizzaCount(slices) {
+    const slicesPerPizza = 8;
+    const wholePizzas = Math.floor(slices / slicesPerPizza);
+    const remainingSlices = slices % slicesPerPizza;
+    
+    // Round up remaining slices to nearest 4
+    const roundedUpSlices = remainingSlices > 0 ? Math.ceil(remainingSlices / 4) * 4 : 0;
+    const excessSlices = roundedUpSlices - remainingSlices;
+    
+    let result = "";
+    
+    if (wholePizzas > 0) {
+      result += `${wholePizzas}`;
+      if (roundedUpSlices > 0) {
+        if (roundedUpSlices === 4) {
+          result += " 1/2";
+        } else if (roundedUpSlices === 8) {
+          result += " 1";
+        }
+        result += " pizzas";
+      } else {
+        result += wholePizzas === 1 ? " pizza" : " pizzas";
+      }
+    } else {
+      // Less than a full pizza
+      if (roundedUpSlices === 4) {
+        result = "1/2 pizza";
+      } else if (roundedUpSlices === 8) {
+        result = "1 pizza";
+      } else {
+        result = "1 pizza"; // fallback
+      }
+    }
+    
+    if (excessSlices > 0) {
+      result += ` (${excessSlices} slice${excessSlices === 1 ? '' : 's'} excess)`;
+    }
+    
+    return result;
+  }
+
   // Display party summary
   function displayPartySummary(data) {
     document.getElementById("partyNumberDisplay").textContent =
@@ -1183,13 +1225,12 @@ document.addEventListener("DOMContentLoaded", function () {
                         ? `<p><strong>Ingredients:</strong> ${pizza.ingredients.join(", ")}</p>`
                         : "<p><strong>Ingredients:</strong> Cheese only</p>"
                     }
-                    <p><strong>Slices:</strong> ${pizza.slices}</p>
-                    ${
+                    <p><strong>Slices:</strong> ${pizza.slices} (${formatPizzaCount(pizza.slices)})</p>
+                    <p class="calculation-method"><em>Target Eaters:</em> ${
                       pizza.target_eaters && pizza.target_eaters.length > 0
-                        ? `<p><strong>Target Eaters:</strong> ${pizza.target_eaters.join(", ")}</p>`
-                        : "<p><strong>Target Eaters:</strong> Everyone</p>"
-                    }
-                    <p class="calculation-method"><em>Calculation:</em> ${pizza.calculation_method}</p>
+                        ? pizza.target_eaters.join(", ")
+                        : "Everyone"
+                    }</p>
                 </div>`,
         )
         .join("");
