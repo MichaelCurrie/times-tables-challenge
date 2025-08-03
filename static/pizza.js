@@ -35,28 +35,34 @@ document.addEventListener("DOMContentLoaded", function () {
     // Clear existing content
     tableBody.innerHTML = "";
 
-    // Default ingredients (will be replaced by API call)
-    const defaultIngredients = [
-      "pepperoni",
-      "mushrooms",
-      "sausage",
-      "bacon",
-      "ham",
-      "chicken",
-      "beef",
-      "anchovies",
-      "olives",
-      "bell-peppers",
-      "onions",
-      "tomatoes",
-      "pineapple",
-      "spinach",
-      "artichokes",
-      "extra-cheese",
-      "vegan-cheese",
-      "basil",
-      "garlic",
-    ];
+    // Organized ingredients by category and alphabetically within each
+    const ingredientCategories = {
+      "MEAT": [
+        "anchovies",
+        "bacon", 
+        "beef",
+        "chicken",
+        "ham",
+        "pepperoni",
+        "sausage"
+      ],
+      "VEGETABLES": [
+        "artichokes",
+        "bell-peppers",
+        "mushrooms",
+        "olives",
+        "onions",
+        "pineapple",
+        "spinach",
+        "tomatoes"
+      ],
+      "HERBS AND CHEESES": [
+        "basil",
+        "extra-cheese",
+        "garlic",
+        "vegan-cheese"
+      ]
+    };
 
     // Ingredient icons mapping
     const ingredientIcons = {
@@ -81,19 +87,32 @@ document.addEventListener("DOMContentLoaded", function () {
       garlic: "🧄",
     };
 
-    defaultIngredients.forEach((ingredient) => {
-      const icon = ingredientIcons[ingredient] || "🍕";
-      const displayName =
-        ingredient.charAt(0).toUpperCase() +
-        ingredient.slice(1).replace("-", " ");
-      const row = document.createElement("tr");
-      row.innerHTML = `
-                <td>${icon} ${displayName}</td>
-                <td><input type="radio" name="pref_${ingredient}" value="0" id="pref_${ingredient}_0"><label for="pref_${ingredient}_0">❌</label></td>
-                <td><input type="radio" name="pref_${ingredient}" value="1" id="pref_${ingredient}_1" checked><label for="pref_${ingredient}_1">😐</label></td>
-                <td><input type="radio" name="pref_${ingredient}" value="2" id="pref_${ingredient}_2"><label for="pref_${ingredient}_2">❤️</label></td>
-            `;
-      tableBody.appendChild(row);
+    // Loop through each category and create sections
+    Object.keys(ingredientCategories).forEach(categoryName => {
+      // Create section header row
+      const headerRow = document.createElement("tr");
+      headerRow.innerHTML = `
+        <td colspan="4" class="ingredient-category-header">
+          <strong>${categoryName}</strong>
+        </td>
+      `;
+      tableBody.appendChild(headerRow);
+
+      // Add ingredients for this category
+      ingredientCategories[categoryName].forEach((ingredient) => {
+        const icon = ingredientIcons[ingredient] || "🍕";
+        const displayName =
+          ingredient.charAt(0).toUpperCase() +
+          ingredient.slice(1).replace("-", " ");
+        const row = document.createElement("tr");
+        row.innerHTML = `
+                  <td>${icon} ${displayName}</td>
+                  <td><input type="radio" name="pref_${ingredient}" value="0" id="pref_${ingredient}_0"><label for="pref_${ingredient}_0">❌</label></td>
+                  <td><input type="radio" name="pref_${ingredient}" value="1" id="pref_${ingredient}_1" checked><label for="pref_${ingredient}_1">😐</label></td>
+                  <td><input type="radio" name="pref_${ingredient}" value="2" id="pref_${ingredient}_2"><label for="pref_${ingredient}_2">❤️</label></td>
+              `;
+        tableBody.appendChild(row);
+      });
     });
   }
 
@@ -357,35 +376,24 @@ document.addEventListener("DOMContentLoaded", function () {
 
     // Collect ingredient preferences for custom pizza
     const preferences = {};
-    const defaultIngredients = [
-      "pepperoni",
-      "mushrooms",
-      "sausage",
-      "bacon",
-      "ham",
-      "chicken",
-      "beef",
-      "anchovies",
-      "olives",
-      "bell-peppers",
-      "onions",
-      "tomatoes",
-      "pineapple",
-      "spinach",
-      "artichokes",
-      "extra-cheese",
-      "vegan-cheese",
-      "basil",
-      "garlic",
+    
+    // Get all ingredients from all categories (flattened)
+    const allIngredients = [
+      // MEAT
+      "anchovies", "bacon", "beef", "chicken", "ham", "pepperoni", "sausage",
+      // VEGETABLES  
+      "artichokes", "bell-peppers", "mushrooms", "olives", "onions", "pineapple", "spinach", "tomatoes",
+      // HERBS AND CHEESES
+      "basil", "extra-cheese", "garlic", "vegan-cheese"
     ];
 
     // Set all preferences to indifferent by default
-    defaultIngredients.forEach((ingredient) => {
+    allIngredients.forEach((ingredient) => {
       preferences[ingredient] = 1; // Default to indifferent
     });
 
     // Override with custom preferences if user made any changes
-    defaultIngredients.forEach((ingredient) => {
+    allIngredients.forEach((ingredient) => {
       const selectedRadio = document.querySelector(
         `input[name="pref_${ingredient}"]:checked`,
       );

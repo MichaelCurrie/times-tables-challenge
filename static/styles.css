@@ -516,6 +516,20 @@ footer svg {
   color: #333;
 }
 
+.ingredient-category-header {
+  background-color: #ff6b35;
+  color: white;
+  text-align: center;
+  padding: 8px 12px;
+  font-size: 14px;
+  font-weight: bold;
+  border-top: 2px solid #e55a2b;
+}
+
+.ingredient-category-header:first-child {
+  border-top: none;
+}
+
 /* ==========================================================================
    On‑Screen Keypad (Mobile)
    ========================================================================== */
