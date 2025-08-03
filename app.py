@@ -222,11 +222,19 @@ def join_pizza_party() -> Dict[str, Any]:
     data = request.get_json()
     party_id = data.get("partyNumber")
     name = data.get("name")
-    slice_count = data.get("sliceCount")
-    preferences = data.get("preferences", {})
+    custom_pizza = data.get("custom_pizza", {})
+    existing_pizza_slices = data.get("existingPizza_slicesWanted", {})
+    
+    # Calculate total slice count from custom pizza and existing pizza selections
+    custom_slices = custom_pizza.get("sliceCount", 0)
+    existing_slices = sum(existing_pizza_slices.values()) if existing_pizza_slices else 0
+    total_slice_count = custom_slices + existing_slices
+    
+    # Get preferences from custom pizza
+    preferences = custom_pizza.get("preferences", {})
 
-    if not all([party_id, name, slice_count]):
-        return jsonify({"error": "Party ID, name, and slice count are required"}), 400
+    if not all([party_id, name]) or total_slice_count <= 0:
+        return jsonify({"error": "Party ID, name, and at least one slice selection are required"}), 400
 
     # Validate party ID format (4 characters, letters and numbers)
     if not party_id or len(party_id) != 4 or not party_id.isalnum():
@@ -302,7 +310,7 @@ def join_pizza_party() -> Dict[str, Any]:
             INSERT INTO pizza_attendees (party_number, name, slice_count)
             VALUES (?, ?, ?)
         """,
-            (party_id.upper(), name, slice_count),
+            (party_id.upper(), name, total_slice_count),
         )
 
         attendee_id = cur.lastrowid
