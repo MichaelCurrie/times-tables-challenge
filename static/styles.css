@@ -698,6 +698,23 @@ body.pizza-theme footer a:hover {
   box-sizing: border-box;
 }
 
+/* Party image styles */
+.party-image {
+  display: flex;
+  justify-content: center;
+  margin: 20px 0;
+  position: relative;
+  z-index: 3;
+}
+
+.summary-image {
+  max-width: 300px;
+  height: auto;
+  border-radius: 15px;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+  border: 2px solid rgba(255, 255, 255, 0.2);
+}
+
 /* Party summary styles */
 .party-summary {
   display: flex;
