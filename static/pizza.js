@@ -176,6 +176,145 @@ document.addEventListener("DOMContentLoaded", function () {
   
   // Initialize party ID population from URL
   populatePartyIdFromUrl();
+  
+  // Setup share button functionality
+  function setupShareButton() {
+    const shareButton = document.getElementById('shareButton');
+    const shareSection = document.getElementById('shareSection');
+    
+    if (shareButton) {
+      shareButton.addEventListener('click', async () => {
+        const path = window.location.pathname;
+        const partyIdMatch = path.match(/^\/([A-Za-z0-9]{4})$/);
+        
+        if (partyIdMatch) {
+          const partyId = partyIdMatch[1].toUpperCase();
+          const shareUrl = `https://slicetomeetyou.com/${partyId}`;
+          
+          if (navigator.share) {
+            // Use native sharing if available
+            try {
+              await navigator.share({
+                title: 'Join my Pizza Party!',
+                text: `Join my pizza party! Use party ID: ${partyId}`,
+                url: shareUrl
+              });
+            } catch (err) {
+              // Fallback to clipboard if user cancels
+              copyToClipboard(shareUrl);
+            }
+          } else {
+            // Fallback to clipboard
+            copyToClipboard(shareUrl);
+          }
+        } else {
+          // No party ID in URL, show message
+          alert('Please enter a party ID first to share!');
+        }
+      });
+    }
+  }
+  
+  // Copy text to clipboard
+  function copyToClipboard(text) {
+    if (navigator.clipboard) {
+      navigator.clipboard.writeText(text).then(() => {
+        alert('Party link copied to clipboard!');
+      }).catch(() => {
+        fallbackCopyToClipboard(text);
+      });
+    } else {
+      fallbackCopyToClipboard(text);
+    }
+  }
+  
+  // Fallback copy method for older browsers
+  function fallbackCopyToClipboard(text) {
+    const textArea = document.createElement('textarea');
+    textArea.value = text;
+    textArea.style.position = 'fixed';
+    textArea.style.left = '-999999px';
+    textArea.style.top = '-999999px';
+    document.body.appendChild(textArea);
+    textArea.focus();
+    textArea.select();
+    
+    try {
+      document.execCommand('copy');
+      alert('Party link copied to clipboard!');
+    } catch (err) {
+      alert('Failed to copy link. Please copy manually: ' + text);
+    }
+    
+    document.body.removeChild(textArea);
+  }
+  
+  // Show/hide share button based on party ID presence
+  function updateShareButtonVisibility() {
+    const path = window.location.pathname;
+    const partyIdMatch = path.match(/^\/([A-Za-z0-9]{4})$/);
+    const shareSection = document.getElementById('shareSection');
+    
+    if (shareSection) {
+      if (partyIdMatch) {
+        shareSection.style.display = 'flex';
+      } else {
+        shareSection.style.display = 'none';
+      }
+    }
+  }
+  
+  // Initialize share functionality
+  setupShareButton();
+  updateShareButtonVisibility();
+  
+  // Setup slice spinner functionality
+  function setupSliceSpinner() {
+    const decreaseBtn = document.getElementById('decreaseSlices');
+    const increaseBtn = document.getElementById('increaseSlices');
+    const sliceInput = document.getElementById('sliceCount');
+    
+    if (decreaseBtn && increaseBtn && sliceInput) {
+      decreaseBtn.addEventListener('click', () => {
+        const currentValue = parseInt(sliceInput.value);
+        if (currentValue > 1) {
+          sliceInput.value = currentValue - 1;
+        }
+      });
+      
+      increaseBtn.addEventListener('click', () => {
+        const currentValue = parseInt(sliceInput.value);
+        if (currentValue < 20) {
+          sliceInput.value = currentValue + 1;
+        }
+      });
+    }
+  }
+  
+  // Setup pizza option selection
+  function setupPizzaOptions() {
+    const pizzaOptions = document.querySelectorAll('.pizza-option');
+    
+    pizzaOptions.forEach(option => {
+      const radio = option.querySelector('input[type="radio"]');
+      const label = option.querySelector('label');
+      
+      // Make the entire option clickable
+      option.addEventListener('click', () => {
+        radio.checked = true;
+        // Trigger change event for any listeners
+        radio.dispatchEvent(new Event('change'));
+      });
+      
+      // Prevent double-clicking when clicking on radio or label
+      radio.addEventListener('click', (e) => e.stopPropagation());
+      label.addEventListener('click', (e) => e.stopPropagation());
+    });
+  }
+  
+  // Initialize slice spinner and pizza options
+  setupSliceSpinner();
+  setupPizzaOptions();
 
   backToHome.addEventListener("click", () => {
     showScreen(startScreen);
@@ -206,6 +345,9 @@ document.addEventListener("DOMContentLoaded", function () {
       return;
     }
 
+    // Get selected pizza choice
+    const pizzaChoice = formData.get("pizzaChoice");
+    
     // Collect ingredient preferences
     const preferences = {};
     const defaultIngredients = [
@@ -230,14 +372,37 @@ document.addEventListener("DOMContentLoaded", function () {
       "garlic",
     ];
 
+    // Set preferences based on pizza choice
+    defaultIngredients.forEach((ingredient) => {
+      preferences[ingredient] = 1; // Default to indifferent
+    });
+
+    // Override preferences based on selected pizza
+    switch (pizzaChoice) {
+      case "pepperoni":
+        preferences["pepperoni"] = 2; // Want
+        break;
+      case "cheese":
+        // Keep all as indifferent (cheese only)
+        break;
+      case "pineapple-ham":
+        preferences["pineapple"] = 2; // Want
+        preferences["ham"] = 2; // Want
+        break;
+      case "spinach-tomato-pineapple":
+        preferences["spinach"] = 2; // Want
+        preferences["tomatoes"] = 2; // Want
+        preferences["pineapple"] = 2; // Want
+        break;
+    }
+
+    // Override with custom preferences if user made any changes
     defaultIngredients.forEach((ingredient) => {
       const selectedRadio = document.querySelector(
         `input[name="pref_${ingredient}"]:checked`,
       );
       if (selectedRadio) {
         preferences[ingredient] = parseInt(selectedRadio.value);
-      } else {
-        preferences[ingredient] = 1; // Default to indifferent
       }
     });
 

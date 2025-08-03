@@ -45,6 +45,19 @@
             🍽️ EATER
           </button>
         </div>
+        <div class="share-section" id="shareSection" style="display: none;">
+          <button
+            class="share-button"
+            id="shareButton"
+            aria-label="Share Party"
+            role="button"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" fill="currentColor">
+              <path d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7s-.04-.47-.09-.7l7.05-4.11c.54.5 1.25.81 2.04.81 1.66 0 3-1.34 3-3s-1.34-3-3-3-3 1.34-3 3c0 .24.04.47.09.7L8.04 9.81C7.5 9.31 6.79 9 6 9c-1.66 0-3 1.34-3 3s1.34 3 3 3c.79 0 1.5-.31 2.04-.81l7.12 4.16c-.05.21-.08.43-.08.65 0 1.61 1.31 2.92 2.92 2.92s2.92-1.31 2.92-2.92-1.31-2.92-2.92-2.92z"/>
+            </svg>
+            Share Party
+          </button>
+        </div>
       </div>
       <!-- EATER Form Screen -->
       <div id="eaterContainer">
@@ -70,19 +83,50 @@
             <label for="eaterName">Your Name:</label>
             <input type="text" id="eaterName" name="eaterName" required />
           </div>
+          
+          <!-- JOIN an existing pizza section -->
           <div class="form-group">
-            <label for="sliceCount">How many slices do you want?</label>
-            <input
-              type="number"
-              id="sliceCount"
-              name="sliceCount"
-              min="1"
-              max="20"
-              required
-            />
+            <label class="section-label">🍕 JOIN an existing pizza</label>
+            <div class="pizza-options">
+              <div class="pizza-option">
+                <input type="radio" id="pizza-pepperoni" name="pizzaChoice" value="pepperoni" checked>
+                <label for="pizza-pepperoni">Pepperoni</label>
+              </div>
+              <div class="pizza-option">
+                <input type="radio" id="pizza-cheese" name="pizzaChoice" value="cheese">
+                <label for="pizza-cheese">Cheese</label>
+              </div>
+              <div class="pizza-option">
+                <input type="radio" id="pizza-pineapple-ham" name="pizzaChoice" value="pineapple-ham">
+                <label for="pizza-pineapple-ham">Pineapple and Ham</label>
+              </div>
+              <div class="pizza-option">
+                <input type="radio" id="pizza-spinach-tomato-pineapple" name="pizzaChoice" value="spinach-tomato-pineapple">
+                <label for="pizza-spinach-tomato-pineapple">Spinach, Tomatoes and Pineapple</label>
+              </div>
+            </div>
+            <div class="slice-selector">
+              <label for="sliceCount">How many slices?</label>
+              <div class="spinner-container">
+                <button type="button" class="spinner-btn" id="decreaseSlices">-</button>
+                <input
+                  type="number"
+                  id="sliceCount"
+                  name="sliceCount"
+                  min="1"
+                  max="20"
+                  value="2"
+                  required
+                  readonly
+                />
+                <button type="button" class="spinner-btn" id="increaseSlices">+</button>
+              </div>
+            </div>
           </div>
+          
+          <!-- MAKE A CUSTOM PIZZA section -->
           <div class="form-group">
-            <label>Pizza Ingredient Preferences:</label>
+            <label class="section-label">🍕 MAKE A CUSTOM PIZZA [Optional]</label>
             <div class="ingredient-table">
               <table>
                 <thead>

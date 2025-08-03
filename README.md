@@ -109,6 +109,9 @@ To debug something that's gone wrong, check the flask logs at:
 ```bash
 sudo systemctl status gunicorn
 sudo systemctl status nginx
+
+journalctl -u gunicorn -f
+journalctl -u nginx -f
 ```
 
 If you make changes to the code, commit them, and then run:

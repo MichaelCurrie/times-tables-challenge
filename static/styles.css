@@ -315,6 +315,162 @@ footer svg {
   fill: currentColor; /* Inherits the button's color */
 }
 
+.share-section {
+  margin-top: 20px;
+  display: flex;
+  justify-content: center;
+}
+
+.share-button {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background-color: #ff6b35;
+  color: white;
+  border: none;
+  border-radius: 25px;
+  padding: 12px 24px;
+  font-size: 16px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.share-button:hover {
+  background-color: #e55a2b;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
+}
+
+.share-button:active {
+  transform: translateY(0);
+}
+
+.share-button svg {
+  width: 20px;
+  height: 20px;
+}
+
+/* Pizza Options Styling */
+.section-label {
+  font-size: 18px;
+  font-weight: bold;
+  color: #ff6b35;
+  margin-bottom: 15px;
+  display: block;
+}
+
+.pizza-options {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.pizza-option {
+  display: flex;
+  align-items: center;
+  padding: 12px 16px;
+  background-color: #fff;
+  border: 2px solid #e0e0e0;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.pizza-option:hover {
+  border-color: #ff6b35;
+  background-color: #fff5f2;
+}
+
+.pizza-option input[type="radio"] {
+  margin-right: 12px;
+  transform: scale(1.2);
+}
+
+.pizza-option input[type="radio"]:checked + label {
+  font-weight: bold;
+  color: #ff6b35;
+}
+
+.pizza-option label {
+  cursor: pointer;
+  font-size: 16px;
+  flex: 1;
+}
+
+.pizza-option:has(input[type="radio"]:checked) {
+  border-color: #ff6b35;
+  background-color: #fff5f2;
+  box-shadow: 0 2px 8px rgba(255, 107, 53, 0.2);
+}
+
+/* Slice Selector Styling */
+.slice-selector {
+  margin-top: 20px;
+}
+
+.slice-selector label {
+  display: block;
+  margin-bottom: 10px;
+  font-weight: bold;
+  color: #333;
+}
+
+.spinner-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0;
+  max-width: 200px;
+  margin: 0 auto;
+}
+
+.spinner-btn {
+  background-color: #ff6b35;
+  color: white;
+  border: none;
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  font-size: 20px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.spinner-btn:hover {
+  background-color: #e55a2b;
+  transform: scale(1.1);
+}
+
+.spinner-btn:active {
+  transform: scale(0.95);
+}
+
+.spinner-container input[type="number"] {
+  width: 80px;
+  height: 40px;
+  text-align: center;
+  border: 2px solid #ff6b35;
+  border-radius: 8px;
+  font-size: 18px;
+  font-weight: bold;
+  color: #333;
+  background-color: white;
+  margin: 0 10px;
+}
+
+.spinner-container input[type="number"]:focus {
+  outline: none;
+  border-color: #e55a2b;
+  box-shadow: 0 0 0 3px rgba(255, 107, 53, 0.2);
+}
+
 /* ==========================================================================
    On‑Screen Keypad (Mobile)
    ========================================================================== */
