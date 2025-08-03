@@ -118,6 +118,12 @@ document.addEventListener("DOMContentLoaded", function () {
         tableBody.appendChild(row);
       });
     });
+    
+    // Initialize the limit checking after table is populated
+    setTimeout(() => {
+      setupIngredientLimits();
+      checkAndEnforceWantLimit();
+    }, 100);
   }
 
   // Navigation functions
@@ -360,6 +366,7 @@ document.addEventListener("DOMContentLoaded", function () {
   setupCustomSliceSpinner();
   setupPizzaOptions();
   setupPreferenceButtons();
+  setupIngredientLimits();
 
   // Populate available pizzas (hardcoded + custom) in the eater form
   async function populateAvailablePizzas() {
@@ -427,6 +434,102 @@ document.addEventListener("DOMContentLoaded", function () {
     return pizzaOption;
   }
 
+  // Setup ingredient limits (max 3 "Want to Eat" selections)
+  function setupIngredientLimits() {
+    const allIngredients = [
+      // MEAT
+      "anchovies", "bacon", "beef", "chicken", "ham", "pepperoni", "sausage",
+      // VEGETABLES  
+      "artichokes", "bell-peppers", "mushrooms", "olives", "onions", "pineapple", "spinach", "tomatoes",
+      // HERBS AND CHEESES
+      "basil", "extra-cheese", "garlic", "vegan-cheese"
+    ];
+
+    // Add event listeners to all "Want to Eat" radio buttons
+    allIngredients.forEach(ingredient => {
+      const wantRadio = document.querySelector(`input[name="pref_${ingredient}"][value="2"]`);
+      if (wantRadio) {
+        wantRadio.addEventListener('change', () => {
+          if (wantRadio.checked) {
+            checkAndEnforceWantLimit();
+          }
+        });
+      }
+    });
+  }
+
+  // Check and enforce the 3-ingredient "Want to Eat" limit
+  function checkAndEnforceWantLimit() {
+    const allIngredients = [
+      "anchovies", "bacon", "beef", "chicken", "ham", "pepperoni", "sausage",
+      "artichokes", "bell-peppers", "mushrooms", "olives", "onions", "pineapple", "spinach", "tomatoes",
+      "basil", "extra-cheese", "garlic", "vegan-cheese"
+    ];
+
+    // Count currently selected "Want to Eat" items
+    const wantSelections = [];
+    allIngredients.forEach(ingredient => {
+      const wantRadio = document.querySelector(`input[name="pref_${ingredient}"][value="2"]`);
+      if (wantRadio && wantRadio.checked) {
+        wantSelections.push(ingredient);
+      }
+    });
+
+    // If more than 3, disable other "Want to Eat" options
+    if (wantSelections.length >= 3) {
+      allIngredients.forEach(ingredient => {
+        const wantRadio = document.querySelector(`input[name="pref_${ingredient}"][value="2"]`);
+        if (wantRadio && !wantRadio.checked) {
+          wantRadio.disabled = true;
+          // Add visual styling to show it's disabled
+          const row = wantRadio.closest('tr');
+          if (row) {
+            row.classList.add('want-limit-reached');
+          }
+        }
+      });
+    } else {
+      // Re-enable all "Want to Eat" options
+      allIngredients.forEach(ingredient => {
+        const wantRadio = document.querySelector(`input[name="pref_${ingredient}"][value="2"]`);
+        if (wantRadio) {
+          wantRadio.disabled = false;
+          const row = wantRadio.closest('tr');
+          if (row) {
+            row.classList.remove('want-limit-reached');
+          }
+        }
+      });
+    }
+
+    // Update counter display if it exists
+    updateWantCounter(wantSelections.length);
+  }
+
+  // Update the "Want to Eat" counter display
+  function updateWantCounter(count) {
+    let counterElement = document.getElementById('wantCounter');
+    if (!counterElement) {
+      // Create counter element if it doesn't exist
+      const tableContainer = document.querySelector('.ingredient-table');
+      if (tableContainer) {
+        counterElement = document.createElement('div');
+        counterElement.id = 'wantCounter';
+        counterElement.className = 'want-counter';
+        tableContainer.appendChild(counterElement);
+      }
+    }
+    
+    if (counterElement) {
+      counterElement.innerHTML = `<strong>${count} / 3 ingredients selected as "Want to Eat"</strong>`;
+      if (count >= 3) {
+        counterElement.classList.add('limit-reached');
+      } else {
+        counterElement.classList.remove('limit-reached');
+      }
+    }
+  }
+
   // Setup preference buttons functionality
   function setupPreferenceButtons() {
     const pizzaRouletteBtn = document.getElementById('pizzaRouletteBtn');
@@ -443,17 +546,42 @@ document.addEventListener("DOMContentLoaded", function () {
       "basil", "extra-cheese", "garlic", "vegan-cheese"
     ];
 
-    // Pizza Roulette - randomize all preferences
+    // Pizza Roulette - randomize all preferences (with 3-ingredient "Want" limit)
     if (pizzaRouletteBtn) {
       pizzaRouletteBtn.addEventListener('click', () => {
+        // First, reset all to indifferent
         allIngredients.forEach(ingredient => {
-          // Randomly select 0, 1, or 2 (will not eat, indifferent, want to eat)
-          const randomPreference = Math.floor(Math.random() * 3);
-          const radio = document.querySelector(`input[name="pref_${ingredient}"][value="${randomPreference}"]`);
+          const radio = document.querySelector(`input[name="pref_${ingredient}"][value="1"]`);
           if (radio) {
             radio.checked = true;
           }
         });
+        
+        // Randomly select up to 3 ingredients to "want"
+        const shuffledIngredients = [...allIngredients].sort(() => Math.random() - 0.5);
+        const wantCount = Math.floor(Math.random() * 4); // 0-3 ingredients to want
+        
+        for (let i = 0; i < Math.min(wantCount, shuffledIngredients.length); i++) {
+          const ingredient = shuffledIngredients[i];
+          const wantRadio = document.querySelector(`input[name="pref_${ingredient}"][value="2"]`);
+          if (wantRadio) {
+            wantRadio.checked = true;
+          }
+        }
+        
+        // Randomly set some others to "will not eat"
+        const remainingIngredients = shuffledIngredients.slice(wantCount);
+        remainingIngredients.forEach(ingredient => {
+          if (Math.random() < 0.3) { // 30% chance to set as "will not eat"
+            const avoidRadio = document.querySelector(`input[name="pref_${ingredient}"][value="0"]`);
+            if (avoidRadio) {
+              avoidRadio.checked = true;
+            }
+          }
+        });
+        
+        // Update the limit enforcement
+        checkAndEnforceWantLimit();
         
         // Add a fun animation effect
         pizzaRouletteBtn.style.transform = 'rotate(360deg)';
@@ -484,6 +612,9 @@ document.addEventListener("DOMContentLoaded", function () {
             radio.checked = true;
           }
         });
+        
+        // Reset the limit enforcement
+        checkAndEnforceWantLimit();
       });
     }
   }
