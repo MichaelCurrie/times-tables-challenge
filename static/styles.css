@@ -373,16 +373,16 @@ footer svg {
   align-items: center;
   justify-content: space-between;
   padding: 12px 16px;
-  background-color: #fff;
-  border: 2px solid #e0e0e0;
+  background-color: #ff6b35;
+  border: 2px solid #e55a2b;
   border-radius: 12px;
   cursor: pointer;
   transition: all 0.3s ease;
 }
 
 .pizza-option:hover {
-  border-color: #ff6b35;
-  background-color: #fff5f2;
+  border-color: #e55a2b;
+  background-color: #e55a2b;
 }
 
 .pizza-info {
@@ -393,7 +393,7 @@ footer svg {
 
 .pizza-label {
   font-size: 16px;
-  color: #333;
+  color: white;
   font-weight: 500;
 }
 
