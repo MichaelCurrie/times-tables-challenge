@@ -5,6 +5,13 @@ import os
 app = Flask(__name__)
 DATABASE = "data.db"
 
+# Available pizza ingredients
+PIZZA_INGREDIENTS = [
+    "pepperoni", "mushrooms", "sausage", "bacon", "ham", "chicken", "beef", 
+    "anchovies", "olives", "bell-peppers", "onions", "tomatoes", "pineapple", 
+    "spinach", "artichokes", "extra-cheese", "vegan-cheese", "basil", "garlic"
+]
+
 # Attendee overrides for special cases
 ATTENDEE_OVERRIDES = [
     {
@@ -60,11 +67,21 @@ def init_db():
     cur.execute("""
       CREATE TABLE IF NOT EXISTS pizza_attendees (
           id INTEGER PRIMARY KEY AUTOINCREMENT,
-          party_number INTEGER NOT NULL,
+          party_number TEXT NOT NULL,
           name TEXT NOT NULL,
           slice_count INTEGER NOT NULL,
-          favorite_topping TEXT NOT NULL,
           timestamp DATETIME DEFAULT CURRENT_TIMESTAMP
+      );
+    """)
+
+    # Pizza ingredient preferences
+    cur.execute("""
+      CREATE TABLE IF NOT EXISTS pizza_preferences (
+          id INTEGER PRIMARY KEY AUTOINCREMENT,
+          attendee_id INTEGER NOT NULL,
+          ingredient TEXT NOT NULL,
+          preference INTEGER NOT NULL, -- 0: will not eat, 1: indifferent, 2: want to eat
+          FOREIGN KEY (attendee_id) REFERENCES pizza_attendees (id) ON DELETE CASCADE
       );
     """)
 
@@ -201,10 +218,10 @@ def join_pizza_party():
     party_id = data.get("partyNumber")
     name = data.get("name")
     slice_count = data.get("sliceCount")
-    favorite_topping = data.get("favoriteTopping")
+    preferences = data.get("preferences", {})
 
-    if not all([party_id, name, slice_count, favorite_topping]):
-        return jsonify({"error": "All fields are required"}), 400
+    if not all([party_id, name, slice_count]):
+        return jsonify({"error": "Party ID, name, and slice count are required"}), 400
     
     # Validate party ID format (4 characters, letters and numbers)
     if not party_id or len(party_id) != 4 or not party_id.isalnum():
@@ -220,31 +237,36 @@ def join_pizza_party():
             if name in override["names"]:
                 # Check if Evelyn is already in this party
                 cur.execute("""
-                    SELECT name FROM pizza_attendees 
+                    SELECT id FROM pizza_attendees 
                     WHERE party_number = ? AND name = ?
                 """, (party_id.upper(), override["trigger_name"]))
                 
-                if cur.fetchone():
+                evelyn_attendee = cur.fetchone()
+                if evelyn_attendee:
                     override_info = override
+                    # Get Evelyn's preferences
+                    cur.execute("""
+                        SELECT ingredient, preference FROM pizza_preferences 
+                        WHERE attendee_id = ?
+                    """, (evelyn_attendee[0],))
+                    preferences = dict(cur.fetchall())
                     break
         
-        # If override is needed, use Evelyn's preferences
-        if override_info:
-            # Get Evelyn's preferences from the database
-            cur.execute("""
-                SELECT slice_count, favorite_topping FROM pizza_attendees 
-                WHERE party_number = ? AND name = ?
-            """, (party_id.upper(), override_info["trigger_name"]))
-            
-            evelyn_data = cur.fetchone()
-            if evelyn_data:
-                slice_count = evelyn_data[0]
-                favorite_topping = evelyn_data[1]
-        
+        # Insert attendee
         cur.execute("""
-            INSERT INTO pizza_attendees (party_number, name, slice_count, favorite_topping)
-            VALUES (?, ?, ?, ?)
-        """, (party_id.upper(), name, slice_count, favorite_topping))
+            INSERT INTO pizza_attendees (party_number, name, slice_count)
+            VALUES (?, ?, ?)
+        """, (party_id.upper(), name, slice_count))
+        
+        attendee_id = cur.lastrowid
+        
+        # Insert preferences for each ingredient
+        for ingredient in PIZZA_INGREDIENTS:
+            preference = preferences.get(ingredient, 1)  # Default to indifferent
+            cur.execute("""
+                INSERT INTO pizza_preferences (attendee_id, ingredient, preference)
+                VALUES (?, ?, ?)
+            """, (attendee_id, ingredient, preference))
         
         conn.commit()
         conn.close()
@@ -263,6 +285,13 @@ def join_pizza_party():
         conn.close()
         return jsonify({"error": str(e)}), 500
 
+@app.route("/pizza/ingredients", methods=["GET"])
+def get_pizza_ingredients():
+    """Get list of available pizza ingredients"""
+    return jsonify({
+        "ingredients": PIZZA_INGREDIENTS
+    })
+
 @app.route("/pizza/summary/<party_id>", methods=["GET"])
 def get_pizza_party_summary(party_id):
     # Validate party ID format
@@ -275,7 +304,7 @@ def get_pizza_party_summary(party_id):
     try:
         # Get all attendees for this party
         cur.execute("""
-            SELECT name, slice_count, favorite_topping
+            SELECT id, name, slice_count
             FROM pizza_attendees
             WHERE party_number = ?
             ORDER BY timestamp
@@ -287,17 +316,41 @@ def get_pizza_party_summary(party_id):
             return jsonify({"error": "No party found with that ID"}), 404
         
         # Calculate totals
-        total_slices = sum(attendee[1] for attendee in attendees)
-        names = [attendee[0] for attendee in attendees]
+        total_slices = sum(attendee[2] for attendee in attendees)
+        names = [attendee[1] for attendee in attendees]
         
-        # Count toppings
-        topping_counts = {}
-        for attendee in attendees:
-            topping = attendee[2]
-            topping_counts[topping] = topping_counts.get(topping, 0) + 1
+        # Get all preferences for this party
+        attendee_ids = [attendee[0] for attendee in attendees]
+        placeholders = ','.join(['?' for _ in attendee_ids])
         
-        # Get top 3 toppings
-        top_toppings = sorted(topping_counts.items(), key=lambda x: x[1], reverse=True)[:3]
+        cur.execute(f"""
+            SELECT attendee_id, ingredient, preference
+            FROM pizza_preferences
+            WHERE attendee_id IN ({placeholders})
+        """, attendee_ids)
+        
+        preferences_data = cur.fetchall()
+        
+        # Organize preferences by ingredient
+        ingredient_scores = {}
+        for attendee_id, ingredient, preference in preferences_data:
+            if ingredient not in ingredient_scores:
+                ingredient_scores[ingredient] = []
+            ingredient_scores[ingredient].append(preference)
+        
+        # Calculate optimal pizza orders
+        pizza_orders = calculate_pizza_orders(attendees, ingredient_scores)
+        
+        # Get top 3 most wanted ingredients
+        top_ingredients = []
+        for ingredient in PIZZA_INGREDIENTS:
+            if ingredient in ingredient_scores:
+                want_count = sum(1 for pref in ingredient_scores[ingredient] if pref == 2)
+                if want_count > 0:
+                    top_ingredients.append((ingredient, want_count))
+        
+        top_ingredients.sort(key=lambda x: x[1], reverse=True)
+        top_3_ingredients = top_ingredients[:3]
         
         conn.close()
         
@@ -305,11 +358,74 @@ def get_pizza_party_summary(party_id):
             "party_number": party_id.upper(),
             "attendees": names,
             "total_slices": total_slices,
-            "top_toppings": top_toppings
+            "top_ingredients": top_3_ingredients,
+            "pizza_orders": pizza_orders
         })
     except Exception as e:
         conn.close()
         return jsonify({"error": str(e)}), 500
+
+def calculate_pizza_orders(attendees, ingredient_scores):
+    """Calculate optimal pizza orders based on attendee preferences"""
+    total_slices = sum(attendee[2] for attendee in attendees)
+    total_pizzas_needed = (total_slices + 9) // 10  # Round up
+    
+    # Calculate ingredient popularity scores
+    ingredient_popularity = {}
+    for ingredient, preferences in ingredient_scores.items():
+        want_count = sum(1 for pref in preferences if pref == 2)
+        avoid_count = sum(1 for pref in preferences if pref == 0)
+        total_people = len(preferences)
+        
+        # Score: (want - avoid) / total_people
+        score = (want_count - avoid_count) / total_people
+        ingredient_popularity[ingredient] = score
+    
+    # Sort ingredients by popularity
+    sorted_ingredients = sorted(ingredient_popularity.items(), key=lambda x: x[1], reverse=True)
+    
+    # Create pizza orders
+    pizza_orders = []
+    
+    # Plain cheese pizza (always needed)
+    pizza_orders.append({
+        "type": "Plain Cheese",
+        "ingredients": [],
+        "slices": 10,
+        "description": "Classic cheese pizza for everyone"
+    })
+    
+    # Create specialty pizzas based on preferences
+    specialty_pizzas_created = 0
+    max_specialty_pizzas = max(0, total_pizzas_needed - 1)  # Leave room for plain pizza
+    
+    for ingredient, score in sorted_ingredients:
+        if specialty_pizzas_created >= max_specialty_pizzas:
+            break
+            
+        if score > 0.2:  # Only create if significantly wanted
+            pizza_orders.append({
+                "type": f"{ingredient.title()} Pizza",
+                "ingredients": [ingredient],
+                "slices": 10,
+                "description": f"Pizza with {ingredient} topping"
+            })
+            specialty_pizzas_created += 1
+    
+    # If we have room for more pizzas, create combination pizzas
+    remaining_pizzas = max_specialty_pizzas - specialty_pizzas_created
+    if remaining_pizzas > 0:
+        # Create combination pizzas with top ingredients
+        top_ingredients = [ing for ing, score in sorted_ingredients[:4] if score > 0.1]
+        if len(top_ingredients) >= 2:
+            pizza_orders.append({
+                "type": "Supreme Pizza",
+                "ingredients": top_ingredients[:3],  # Max 3 ingredients per combo
+                "slices": 10,
+                "description": f"Combination pizza with {', '.join(top_ingredients[:3])}"
+            })
+    
+    return pizza_orders
 
 if __name__ == '__main__':
     app.run(debug=True)
