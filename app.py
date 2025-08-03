@@ -358,6 +358,81 @@ def get_pizza_ingredients() -> Dict[str, List[str]]:
     return jsonify({"ingredients": PIZZA_INGREDIENTS})
 
 
+@app.route("/pizza/available", methods=["GET"])
+def get_available_pizzas() -> Dict[str, Any]:
+    """
+    Get all available pizzas (hardcoded + custom created ones).
+
+    Returns:
+        Dict[str, Any]: JSON response with hardcoded and custom pizzas
+    """
+    # Hardcoded pizzas
+    hardcoded_pizzas = [
+        {
+            "id": "pepperoni",
+            "name": "Pepperoni",
+            "ingredients": ["pepperoni"],
+            "type": "hardcoded"
+        },
+        {
+            "id": "cheese",
+            "name": "Cheese",
+            "ingredients": [],
+            "type": "hardcoded"
+        },
+        {
+            "id": "pineapple-ham",
+            "name": "Pineapple and Ham",
+            "ingredients": ["pineapple", "ham"],
+            "type": "hardcoded"
+        },
+        {
+            "id": "spinach-tomato-pineapple",
+            "name": "Spinach, Tomatoes and Pineapple",
+            "ingredients": ["spinach", "tomatoes", "pineapple"],
+            "type": "hardcoded"
+        }
+    ]
+
+    # Get custom pizzas from database
+    conn = sqlite3.connect(DATABASE)
+    cur = conn.cursor()
+
+    try:
+        # Get all named pizzas with their ingredients
+        cur.execute("""
+            SELECT np.id, np.name, GROUP_CONCAT(npi.ingredient, ',') as ingredients
+            FROM named_pizzas np
+            LEFT JOIN named_pizzas_ingredients npi ON np.id = npi.pizza_id
+            GROUP BY np.id, np.name
+            ORDER BY np.timestamp DESC
+        """)
+        
+        custom_pizzas_data = cur.fetchall()
+        custom_pizzas = []
+        
+        for pizza_id, name, ingredients_str in custom_pizzas_data:
+            ingredients = ingredients_str.split(',') if ingredients_str else []
+            custom_pizzas.append({
+                "id": f"custom_{pizza_id}",
+                "name": name,
+                "ingredients": ingredients,
+                "type": "custom"
+            })
+
+        conn.close()
+
+        return jsonify({
+            "hardcoded_pizzas": hardcoded_pizzas,
+            "custom_pizzas": custom_pizzas,
+            "all_pizzas": hardcoded_pizzas + custom_pizzas
+        })
+
+    except Exception as e:
+        conn.close()
+        return jsonify({"error": str(e)}), 500
+
+
 @app.route("/pizza/create", methods=["POST"])
 def create_pizza() -> Dict[str, Any]:
     """

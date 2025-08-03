@@ -440,6 +440,16 @@ footer svg {
   background-color: white;
 }
 
+.pizza-separator {
+  margin: 20px 0 15px 0;
+  padding: 10px 15px;
+  background: linear-gradient(45deg, #8e44ad, #9b59b6);
+  color: white;
+  text-align: center;
+  border-radius: 8px;
+  font-size: 16px;
+}
+
 /* Slice Selector Styling */
 .slice-selector {
   margin-top: 20px;

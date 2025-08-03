@@ -146,6 +146,7 @@ document.addEventListener("DOMContentLoaded", function () {
   eaterButton.addEventListener("click", () => {
     showScreen(eaterContainer);
     populateIngredientTable();
+    populateAvailablePizzas();
     // Auto-focus the first input field for better UX
     setTimeout(() => {
       document.getElementById("partyNumber").focus();
@@ -359,6 +360,72 @@ document.addEventListener("DOMContentLoaded", function () {
   setupCustomSliceSpinner();
   setupPizzaOptions();
   setupPreferenceButtons();
+
+  // Populate available pizzas (hardcoded + custom) in the eater form
+  async function populateAvailablePizzas() {
+    try {
+      const response = await fetch('/pizza/available');
+      const data = await response.json();
+      
+      if (response.ok) {
+        const pizzaOptionsContainer = document.querySelector('.pizza-options');
+        if (!pizzaOptionsContainer) return;
+        
+        // Clear existing options
+        pizzaOptionsContainer.innerHTML = '';
+        
+        // Add hardcoded pizzas first
+        data.hardcoded_pizzas.forEach(pizza => {
+          const pizzaOption = createPizzaOption(pizza);
+          pizzaOptionsContainer.appendChild(pizzaOption);
+        });
+        
+        // Add custom pizzas if any exist
+        if (data.custom_pizzas.length > 0) {
+          // Add a separator
+          const separator = document.createElement('div');
+          separator.className = 'pizza-separator';
+          separator.innerHTML = '<strong>🍕 Custom Pizzas</strong>';
+          pizzaOptionsContainer.appendChild(separator);
+          
+          data.custom_pizzas.forEach(pizza => {
+            const pizzaOption = createPizzaOption(pizza);
+            pizzaOptionsContainer.appendChild(pizzaOption);
+          });
+        }
+        
+        // Reinitialize pizza slice spinners for new elements
+        setupPizzaSliceSpinners();
+      }
+    } catch (error) {
+      console.error('Error fetching available pizzas:', error);
+    }
+  }
+
+  // Create a pizza option element
+  function createPizzaOption(pizza) {
+    const pizzaOption = document.createElement('div');
+    pizzaOption.className = 'pizza-option';
+    
+    // Create ingredients display
+    let ingredientsText = '';
+    if (pizza.ingredients.length > 0) {
+      ingredientsText = ` (${pizza.ingredients.join(', ')})`;
+    }
+    
+    pizzaOption.innerHTML = `
+      <div class="pizza-info">
+        <label class="pizza-label">${pizza.name}${ingredientsText}</label>
+      </div>
+      <div class="pizza-slice-spinner">
+        <button type="button" class="mini-spinner-btn" data-pizza="${pizza.id}" data-action="decrease">-</button>
+        <input type="number" class="pizza-slice-input" data-pizza="${pizza.id}" value="0" min="0" max="10" readonly>
+        <button type="button" class="mini-spinner-btn" data-pizza="${pizza.id}" data-action="increase">+</button>
+      </div>
+    `;
+    
+    return pizzaOption;
+  }
 
   // Setup preference buttons functionality
   function setupPreferenceButtons() {
