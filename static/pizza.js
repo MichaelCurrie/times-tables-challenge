@@ -1,6 +1,34 @@
 // Pizza Party JavaScript
 
-document.addEventListener("DOMContentLoaded", function () {
+// Global ingredients data
+let INGREDIENTS_DATA = null;
+
+document.addEventListener("DOMContentLoaded", async function () {
+  // Load ingredients data from API
+  try {
+    const response = await fetch("/pizza/ingredients");
+    INGREDIENTS_DATA = await response.json();
+  } catch (error) {
+    console.error("Failed to load ingredients:", error);
+    // Fallback to empty data
+    INGREDIENTS_DATA = { all_ingredients: [], categories: {}, icons: {} };
+  }
+
+  // Helper function to get all ingredients
+  function getAllIngredients() {
+    return INGREDIENTS_DATA.all_ingredients || [];
+  }
+
+  // Helper function to get ingredient categories
+  function getIngredientCategories() {
+    return INGREDIENTS_DATA.categories || {};
+  }
+
+  // Helper function to get ingredient icons
+  function getIngredientIcons() {
+    return INGREDIENTS_DATA.icons || {};
+  }
+
   // Get all the containers
   const startScreen = document.getElementById("startScreen");
   const eaterContainer = document.getElementById("eaterContainer");
@@ -41,52 +69,9 @@ document.addEventListener("DOMContentLoaded", function () {
     // Clear existing content
     tableBody.innerHTML = "";
 
-    // Organized ingredients by category and alphabetically within each
-    const ingredientCategories = {
-      MEAT: [
-        "anchovies",
-        "bacon",
-        "beef",
-        "chicken",
-        "ham",
-        "pepperoni",
-        "sausage",
-      ],
-      VEGETABLES: [
-        "artichokes",
-        "bell-peppers",
-        "mushrooms",
-        "olives",
-        "onions",
-        "pineapple",
-        "spinach",
-        "tomatoes",
-      ],
-      "HERBS AND CHEESES": ["basil", "extra-cheese", "garlic", "vegan-cheese"],
-    };
-
-    // Ingredient icons mapping
-    const ingredientIcons = {
-      pepperoni: "🍕",
-      mushrooms: "🍄",
-      sausage: "🌭",
-      bacon: "🥓",
-      ham: "🥩",
-      chicken: "🍗",
-      beef: "🥩",
-      anchovies: "🐟",
-      olives: "🫒",
-      "bell-peppers": "🫑",
-      onions: "🧅",
-      tomatoes: "🍅",
-      pineapple: "🍍",
-      spinach: "🥬",
-      artichokes: "🥬",
-      "extra-cheese": "🧀",
-      "vegan-cheese": "🧀",
-      basil: "🌿",
-      garlic: "🧄",
-    };
+    // Get ingredients data from loaded JSON
+    const ingredientCategories = getIngredientCategories();
+    const ingredientIcons = getIngredientIcons();
 
     // Loop through each category and create sections
     Object.keys(ingredientCategories).forEach((categoryName) => {
@@ -108,9 +93,9 @@ document.addEventListener("DOMContentLoaded", function () {
         const row = document.createElement("tr");
         row.innerHTML = `
                   <td>${icon} ${displayName}</td>
-                  <td><input type="radio" name="pref_${ingredient}" value="0" id="pref_${ingredient}_0"><label for="pref_${ingredient}_0">❌</label></td>
-                  <td><input type="radio" name="pref_${ingredient}" value="1" id="pref_${ingredient}_1" checked><label for="pref_${ingredient}_1">😐</label></td>
                   <td><input type="radio" name="pref_${ingredient}" value="2" id="pref_${ingredient}_2"><label for="pref_${ingredient}_2">❤️</label></td>
+                  <td><input type="radio" name="pref_${ingredient}" value="1" id="pref_${ingredient}_1" checked><label for="pref_${ingredient}_1">😐</label></td>
+                  <td><input type="radio" name="pref_${ingredient}" value="0" id="pref_${ingredient}_0"><label for="pref_${ingredient}_0">❌</label></td>
               `;
         tableBody.appendChild(row);
       });
@@ -441,30 +426,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
   // Setup ingredient limits (max 3 "Must Have" selections)
   function setupIngredientLimits() {
-    const allIngredients = [
-      // MEAT
-      "anchovies",
-      "bacon",
-      "beef",
-      "chicken",
-      "ham",
-      "pepperoni",
-      "sausage",
-      // VEGETABLES
-      "artichokes",
-      "bell-peppers",
-      "mushrooms",
-      "olives",
-      "onions",
-      "pineapple",
-      "spinach",
-      "tomatoes",
-      // HERBS AND CHEESES
-      "basil",
-      "extra-cheese",
-      "garlic",
-      "vegan-cheese",
-    ];
+    const allIngredients = getAllIngredients();
 
     // Add event listeners to all "Must Have" radio buttons
     allIngredients.forEach((ingredient) => {
@@ -483,27 +445,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
   // Check and enforce the 3-ingredient "Must Have" limit
   function checkAndEnforceWantLimit() {
-    const allIngredients = [
-      "anchovies",
-      "bacon",
-      "beef",
-      "chicken",
-      "ham",
-      "pepperoni",
-      "sausage",
-      "artichokes",
-      "bell-peppers",
-      "mushrooms",
-      "olives",
-      "onions",
-      "pineapple",
-      "spinach",
-      "tomatoes",
-      "basil",
-      "extra-cheese",
-      "garlic",
-      "vegan-cheese",
-    ];
+    const allIngredients = getAllIngredients();
 
     // Count currently selected "Must Have" items
     const wantSelections = [];
@@ -582,30 +524,7 @@ document.addEventListener("DOMContentLoaded", function () {
     const resetPreferencesBtn = document.getElementById("resetPreferencesBtn");
 
     // Get all ingredients list
-    const allIngredients = [
-      // MEAT
-      "anchovies",
-      "bacon",
-      "beef",
-      "chicken",
-      "ham",
-      "pepperoni",
-      "sausage",
-      // VEGETABLES
-      "artichokes",
-      "bell-peppers",
-      "mushrooms",
-      "olives",
-      "onions",
-      "pineapple",
-      "spinach",
-      "tomatoes",
-      // HERBS AND CHEESES
-      "basil",
-      "extra-cheese",
-      "garlic",
-      "vegan-cheese",
-    ];
+    const allIngredients = getAllIngredients();
 
     // Pizza Roulette - randomize all preferences (with 3-ingredient "Must Have" limit)
     if (pizzaRouletteBtn) {
@@ -705,52 +624,9 @@ document.addEventListener("DOMContentLoaded", function () {
     // Clear existing content
     checkboxContainer.innerHTML = "";
 
-    // Use the same categorized ingredients as the eater form
-    const ingredientCategories = {
-      MEAT: [
-        "anchovies",
-        "bacon",
-        "beef",
-        "chicken",
-        "ham",
-        "pepperoni",
-        "sausage",
-      ],
-      VEGETABLES: [
-        "artichokes",
-        "bell-peppers",
-        "mushrooms",
-        "olives",
-        "onions",
-        "pineapple",
-        "spinach",
-        "tomatoes",
-      ],
-      "HERBS AND CHEESES": ["basil", "extra-cheese", "garlic", "vegan-cheese"],
-    };
-
-    // Ingredient icons mapping
-    const ingredientIcons = {
-      pepperoni: "🍕",
-      mushrooms: "🍄",
-      sausage: "🌭",
-      bacon: "🥓",
-      ham: "🥩",
-      chicken: "🍗",
-      beef: "🥩",
-      anchovies: "🐟",
-      olives: "🫒",
-      "bell-peppers": "🫑",
-      onions: "🧅",
-      tomatoes: "🍅",
-      pineapple: "🍍",
-      spinach: "🥬",
-      artichokes: "🥬",
-      "extra-cheese": "🧀",
-      "vegan-cheese": "🧀",
-      basil: "🌿",
-      garlic: "🧄",
-    };
+    // Get ingredients data from loaded JSON
+    const ingredientCategories = getIngredientCategories();
+    const ingredientIcons = getIngredientIcons();
 
     // Create categorized sections with checkboxes
     Object.keys(ingredientCategories).forEach((categoryName) => {
@@ -882,30 +758,7 @@ document.addEventListener("DOMContentLoaded", function () {
     const preferences = {};
 
     // Get all ingredients from all categories (flattened)
-    const allIngredients = [
-      // MEAT
-      "anchovies",
-      "bacon",
-      "beef",
-      "chicken",
-      "ham",
-      "pepperoni",
-      "sausage",
-      // VEGETABLES
-      "artichokes",
-      "bell-peppers",
-      "mushrooms",
-      "olives",
-      "onions",
-      "pineapple",
-      "spinach",
-      "tomatoes",
-      // HERBS AND CHEESES
-      "basil",
-      "extra-cheese",
-      "garlic",
-      "vegan-cheese",
-    ];
+    const allIngredients = getAllIngredients();
 
     // Set all preferences to indifferent by default
     allIngredients.forEach((ingredient) => {

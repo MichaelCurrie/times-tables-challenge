@@ -1,33 +1,24 @@
 from flask import Flask, request, jsonify, render_template
 import sqlite3
 import os
+import json
 from typing import List, Dict, Tuple, Optional, Any
 
 app = Flask(__name__)
 DATABASE = "data.db"
 
-# Available pizza ingredients
-PIZZA_INGREDIENTS: List[str] = [
-    "pepperoni",
-    "mushrooms",
-    "sausage",
-    "bacon",
-    "ham",
-    "chicken",
-    "beef",
-    "anchovies",
-    "olives",
-    "bell-peppers",
-    "onions",
-    "tomatoes",
-    "pineapple",
-    "spinach",
-    "artichokes",
-    "extra-cheese",
-    "vegan-cheese",
-    "basil",
-    "garlic",
-]
+def load_ingredients() -> Dict[str, Any]:
+    """Load ingredients data from JSON file."""
+    try:
+        with open("ingredients.json", "r", encoding="utf-8") as f:
+            return json.load(f)
+    except FileNotFoundError:
+        # Fallback if file doesn't exist
+        return {"all_ingredients": [], "categories": {}, "icons": {}}
+
+# Load ingredients data
+INGREDIENTS_DATA = load_ingredients()
+PIZZA_INGREDIENTS: List[str] = INGREDIENTS_DATA.get("all_ingredients", [])
 
 # Attendee overrides for special cases
 ATTENDEE_OVERRIDES: List[Dict[str, Any]] = [
@@ -370,14 +361,14 @@ def join_pizza_party() -> Dict[str, Any]:
 
 
 @app.route("/pizza/ingredients", methods=["GET"])
-def get_pizza_ingredients() -> Dict[str, List[str]]:
+def get_pizza_ingredients() -> Dict[str, Any]:
     """
-    Get list of available pizza ingredients.
+    Get all available pizza ingredients with categories and icons.
 
     Returns:
-        Dict[str, List[str]]: JSON response with list of ingredient names
+        Dict[str, Any]: JSON response with complete ingredients data
     """
-    return jsonify({"ingredients": PIZZA_INGREDIENTS})
+    return jsonify(INGREDIENTS_DATA)
 
 
 @app.route("/pizza/available", methods=["GET"])
