@@ -7,6 +7,7 @@ from typing import List, Dict, Tuple, Optional, Any
 app = Flask(__name__)
 DATABASE = "data.db"
 
+
 def load_ingredients() -> Dict[str, Any]:
     """Load ingredients data from JSON file."""
     try:
@@ -15,6 +16,7 @@ def load_ingredients() -> Dict[str, Any]:
     except FileNotFoundError:
         # Fallback if file doesn't exist
         return {"all_ingredients": [], "categories": {}, "icons": {}}
+
 
 # Load ingredients data
 INGREDIENTS_DATA = load_ingredients()
@@ -832,23 +834,23 @@ def calculate_pizza_orders(
 def format_pizza_count(slices: int) -> str:
     """
     Format pizza count based on 8 slices per pizza, rounded up to nearest 4.
-    
+
     Args:
         slices (int): Number of slices needed
-        
+
     Returns:
         str: Formatted pizza count string (e.g., "1 1/2 pizzas, 2 slices excess")
     """
     slices_per_pizza = 8
     whole_pizzas = slices // slices_per_pizza
     remaining_slices = slices % slices_per_pizza
-    
+
     # Round up remaining slices to nearest 4
     rounded_up_slices = ((remaining_slices + 3) // 4) * 4 if remaining_slices > 0 else 0
     excess_slices = rounded_up_slices - remaining_slices
-    
+
     result = ""
-    
+
     if whole_pizzas > 0:
         result += str(whole_pizzas)
         if rounded_up_slices > 0:
@@ -867,11 +869,11 @@ def format_pizza_count(slices: int) -> str:
             result = "1 pizza"
         else:
             result = "1 pizza"  # fallback
-    
+
     if excess_slices > 0:
         plural = "s" if excess_slices > 1 else ""
         result += f" ({excess_slices} slice{plural} excess)"
-    
+
     return result
 
 
